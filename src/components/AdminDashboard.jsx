@@ -1,0 +1,494 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Shield,
+  Key,
+  Users,
+  CheckCircle,
+  XCircle,
+  Calendar,
+  Search,
+  Filter,
+  Download,
+  Trash2,
+  X,
+  RefreshCw,
+  Sparkles,
+  Phone,
+  Mail,
+  Clock,
+  ArrowUpDown,
+} from 'lucide-react';
+import { weddingConfig } from '../config/weddingConfig';
+
+export function AdminDashboard({ isOpen, onClose }) {
+  const { events } = weddingConfig;
+
+  const [passcode, setPasscode] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authError, setAuthError] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+
+  // Data states
+  const [stats, setStats] = useState(null);
+  const [rsvps, setRsvps] = useState([]);
+  const [isLoadingData, setIsLoadingData] = useState(false);
+
+  // Filters
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [eventFilter, setEventFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState('newest');
+
+  // Load stats and RSVPs once authenticated
+  const loadDashboardData = async (activePasscode = passcode) => {
+    setIsLoadingData(true);
+    try {
+      // 1. Fetch Stats
+      const statsRes = await fetch('/api/admin/stats', {
+        headers: { 'x-admin-passcode': activePasscode },
+      });
+      const statsData = await statsRes.json();
+      if (statsRes.ok && statsData.success) {
+        setStats(statsData.data);
+      }
+
+      // 2. Fetch RSVPs with current filters
+      const params = new URLSearchParams({
+        search: searchQuery,
+        status: statusFilter,
+        event: eventFilter,
+        sort: sortOrder,
+      });
+
+      const rsvpsRes = await fetch(`/api/admin/rsvps?${params.toString()}`, {
+        headers: { 'x-admin-passcode': activePasscode },
+      });
+      const rsvpsData = await rsvpsRes.json();
+      if (rsvpsRes.ok && rsvpsData.success) {
+        setRsvps(rsvpsData.data);
+      }
+    } catch (err) {
+      console.error('Failed to load admin data:', err);
+    } finally {
+      setIsLoadingData(false);
+    }
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    setIsVerifying(true);
+
+    try {
+      const res = await fetch('/api/admin/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ passcode }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsAuthenticated(true);
+        loadDashboardData(passcode);
+      } else {
+        setAuthError(data.error || 'Invalid passcode. Access denied.');
+      }
+    } catch (err) {
+      setAuthError('Connection error. Could not verify passcode.');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadDashboardData();
+    }
+  }, [searchQuery, statusFilter, eventFilter, sortOrder]);
+
+  const handleExportCsv = () => {
+    window.location.href = `/api/admin/export?passcode=${encodeURIComponent(passcode)}`;
+  };
+
+  const handleDeleteRsvp = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to remove the RSVP response for "${name}"?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/admin/rsvps/${id}`, {
+        method: 'DELETE',
+        headers: { 'x-admin-passcode': passcode },
+      });
+
+      if (res.ok) {
+        loadDashboardData();
+      }
+    } catch (err) {
+      alert('Failed to delete RSVP record.');
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-stone-950/80 backdrop-blur-md animate-fade-in overflow-y-auto">
+      <div className="relative w-full max-w-6xl max-h-[92vh] flex flex-col bg-cream-light rounded-3xl border-2 border-gold-rich shadow-2xl overflow-hidden my-auto">
+        {/* Top Header Bar */}
+        <div className="bg-maroon-royal text-ivory-50 px-6 py-4 flex items-center justify-between border-b border-gold-rich/40">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 rounded-lg bg-maroon-800 text-gold-champagne border border-gold-rich/30">
+              <Shield className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="font-serif text-xl sm:text-2xl font-bold tracking-wide">
+                Couple's RSVP Administration
+              </h2>
+              <span className="text-[11px] text-gold-champagne tracking-wider uppercase block">
+                Yaswanth Sai &amp; Lakshmi Mrudula • Private Guest Portal
+              </span>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="p-2 text-stone-300 hover:text-white rounded-full hover:bg-maroon-800 transition-colors"
+            aria-label="Close Admin Modal"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Content Body */}
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8">
+          {!isAuthenticated ? (
+            /* Passcode Login Screen */
+            <div className="max-w-md mx-auto my-12 text-center">
+              <div className="w-16 h-16 rounded-full bg-gold-100 border border-gold-rich flex items-center justify-center mx-auto mb-6 text-maroon-royal shadow-sm">
+                <Key className="w-8 h-8 text-gold-deep" />
+              </div>
+
+              <h3 className="font-serif text-3xl font-bold text-maroon-royal mb-2">
+                Private Portal Access
+              </h3>
+              <p className="text-stone-600 text-sm mb-6 font-light">
+                Please enter the wedding administrative passkey to access guest responses and analytics.
+              </p>
+
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Enter admin passcode"
+                    value={passcode}
+                    onChange={(e) => setPasscode(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gold-300 bg-white focus:outline-none focus:border-gold-rich focus:ring-2 focus:ring-gold-200 text-center text-lg font-mono tracking-widest"
+                  />
+                  {authError && (
+                    <p className="text-xs text-red-600 mt-2 font-medium">
+                      {authError}
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isVerifying}
+                  className="w-full py-3.5 rounded-xl bg-maroon-royal hover:bg-maroon-800 text-ivory-50 text-xs font-bold uppercase tracking-widest transition-all shadow-md"
+                >
+                  {isVerifying ? 'Authenticating...' : 'Unlock Guestbook'}
+                </button>
+              </form>
+            </div>
+          ) : (
+            /* Authenticated Admin Dashboard */
+            <div className="space-y-8">
+              {/* Analytics Summary Cards */}
+              {stats && (
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-serif text-2xl font-bold text-maroon-royal">
+                      RSVP Metrics Overview
+                    </h3>
+                    <button
+                      onClick={() => loadDashboardData()}
+                      className="inline-flex items-center space-x-1.5 text-xs text-stone-600 hover:text-maroon-royal px-3 py-1.5 rounded-lg border border-gold-200 hover:bg-gold-50"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isLoadingData ? 'animate-spin' : ''}`} />
+                      <span>Refresh</span>
+                    </button>
+                  </div>
+
+                  {/* 4 Key KPI Cards */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Total Submissions */}
+                    <div className="p-4 sm:p-5 rounded-2xl bg-white border border-gold-200 shadow-sm">
+                      <div className="flex items-center justify-between text-stone-500 mb-2">
+                        <span className="text-xs uppercase tracking-wider font-semibold">Total Responses</span>
+                        <Users className="w-4 h-4 text-gold-deep" />
+                      </div>
+                      <div className="font-serif text-3xl sm:text-4xl font-bold text-maroon-royal">
+                        {stats.totalSubmissions}
+                      </div>
+                      <span className="text-[11px] text-stone-500">Total submitted parties</span>
+                    </div>
+
+                    {/* Total Expected Attendees */}
+                    <div className="p-4 sm:p-5 rounded-2xl bg-white border border-emerald-300 shadow-sm">
+                      <div className="flex items-center justify-between text-emerald-800 mb-2">
+                        <span className="text-xs uppercase tracking-wider font-semibold">Expected Guests</span>
+                        <Users className="w-4 h-4 text-emerald-600" />
+                      </div>
+                      <div className="font-serif text-3xl sm:text-4xl font-bold text-emerald-900">
+                        {stats.totalExpectedAttendees}
+                      </div>
+                      <span className="text-[11px] text-stone-500">Total individuals attending</span>
+                    </div>
+
+                    {/* Accepting Responses */}
+                    <div className="p-4 sm:p-5 rounded-2xl bg-white border border-gold-200 shadow-sm">
+                      <div className="flex items-center justify-between text-stone-500 mb-2">
+                        <span className="text-xs uppercase tracking-wider font-semibold">Acceptances</span>
+                        <CheckCircle className="w-4 h-4 text-emerald-600" />
+                      </div>
+                      <div className="font-serif text-3xl sm:text-4xl font-bold text-emerald-800">
+                        {stats.attendingSubmissions}
+                      </div>
+                      <span className="text-[11px] text-stone-500">Parties joyfully attending</span>
+                    </div>
+
+                    {/* Declining Responses */}
+                    <div className="p-4 sm:p-5 rounded-2xl bg-white border border-gold-200 shadow-sm">
+                      <div className="flex items-center justify-between text-stone-500 mb-2">
+                        <span className="text-xs uppercase tracking-wider font-semibold">Declines</span>
+                        <XCircle className="w-4 h-4 text-stone-400" />
+                      </div>
+                      <div className="font-serif text-3xl sm:text-4xl font-bold text-stone-600">
+                        {stats.declinedSubmissions}
+                      </div>
+                      <span className="text-[11px] text-stone-500">Parties unable to join</span>
+                    </div>
+                  </div>
+
+                  {/* Attendance per Event Cards */}
+                  <div className="mt-6 p-5 rounded-2xl bg-gold-50/70 border border-gold-200">
+                    <h4 className="text-xs uppercase tracking-widest text-maroon-royal font-bold mb-3">
+                      Expected Attendance by Celebration Event:
+                    </h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                      {events.map((ev) => (
+                        <div key={ev.id} className="p-3 bg-white rounded-xl border border-gold-200/80 text-center">
+                          <span className="text-xs font-serif font-bold text-stone-800 line-clamp-1 block mb-1">
+                            {ev.title}
+                          </span>
+                          <span className="font-serif text-2xl font-bold text-maroon-royal block">
+                            {stats.eventCounts[ev.id] || 0}
+                          </span>
+                          <span className="text-[10px] text-stone-500">Guests</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Controls: Search, Filters, Export to CSV */}
+              <div className="pt-4 border-t border-gold-200">
+                <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-6">
+                  {/* Search box */}
+                  <div className="relative flex-1 max-w-md">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-stone-400">
+                      <Search className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Search by name, email, or phone..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gold-200 bg-white text-sm focus:outline-none focus:border-gold-rich focus:ring-1 focus:ring-gold-200"
+                    />
+                  </div>
+
+                  {/* Filter Selects */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Status filter */}
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="px-3 py-2.5 rounded-xl border border-gold-200 bg-white text-xs font-medium text-stone-700 focus:outline-none"
+                    >
+                      <option value="all">All Responses</option>
+                      <option value="attending">Attending Only</option>
+                      <option value="declined">Declined Only</option>
+                    </select>
+
+                    {/* Event filter */}
+                    <select
+                      value={eventFilter}
+                      onChange={(e) => setEventFilter(e.target.value)}
+                      className="px-3 py-2.5 rounded-xl border border-gold-200 bg-white text-xs font-medium text-stone-700 focus:outline-none"
+                    >
+                      <option value="all">All Events</option>
+                      {events.map((ev) => (
+                        <option key={ev.id} value={ev.id}>
+                          {ev.title}
+                        </option>
+                      ))}
+                    </select>
+
+                    {/* Export to CSV Button */}
+                    <button
+                      onClick={handleExportCsv}
+                      className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-sm"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Export CSV</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Guest List Table */}
+                <div className="rounded-2xl border border-gold-200 bg-white overflow-hidden shadow-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-gold-50 text-stone-700 border-b border-gold-200 uppercase tracking-wider font-semibold text-[11px]">
+                        <tr>
+                          <th className="px-4 py-3.5">Guest &amp; Contact</th>
+                          <th className="px-4 py-3.5 text-center">Status</th>
+                          <th className="px-4 py-3.5 text-center">Party Size</th>
+                          <th className="px-4 py-3.5">Selected Events</th>
+                          <th className="px-4 py-3.5">Dietary / Notes</th>
+                          <th className="px-4 py-3.5">Submitted</th>
+                          <th className="px-4 py-3.5 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-stone-100">
+                        {rsvps.length === 0 ? (
+                          <tr>
+                            <td colSpan="7" className="px-6 py-12 text-center text-stone-500 font-light italic">
+                              No RSVP records match the current filter.
+                            </td>
+                          </tr>
+                        ) : (
+                          rsvps.map((rsvp) => {
+                            const isAttending = rsvp.attendance_status === 'attending';
+
+                            return (
+                              <tr key={rsvp.id} className="hover:bg-gold-50/40 transition-colors">
+                                {/* Guest Name & Contact */}
+                                <td className="px-4 py-4">
+                                  <div className="font-semibold text-stone-900 text-sm">
+                                    {rsvp.guest_name}
+                                  </div>
+                                  <div className="text-stone-500 flex items-center space-x-1.5 mt-0.5">
+                                    <Mail className="w-3 h-3 text-gold-deep" />
+                                    <span>{rsvp.guest_email}</span>
+                                  </div>
+                                  {rsvp.phone_number && (
+                                    <div className="text-stone-500 flex items-center space-x-1.5 mt-0.5">
+                                      <Phone className="w-3 h-3 text-gold-deep" />
+                                      <span>{rsvp.phone_number}</span>
+                                    </div>
+                                  )}
+                                  {rsvp.additional_guests && (
+                                    <div className="text-[11px] text-maroon-800 italic mt-1">
+                                      + {rsvp.additional_guests}
+                                    </div>
+                                  )}
+                                </td>
+
+                                {/* Attendance Status */}
+                                <td className="px-4 py-4 text-center">
+                                  <span
+                                    className={`inline-block px-2.5 py-1 rounded-full text-[10px] uppercase font-bold tracking-wider ${
+                                      isAttending
+                                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                        : 'bg-stone-100 text-stone-600 border border-stone-300'
+                                    }`}
+                                  >
+                                    {isAttending ? 'Attending' : 'Declined'}
+                                  </span>
+                                </td>
+
+                                {/* Total Attendees */}
+                                <td className="px-4 py-4 text-center">
+                                  <span className="font-serif text-base font-bold text-stone-800">
+                                    {rsvp.attendees_count}
+                                  </span>
+                                </td>
+
+                                {/* Selected Events */}
+                                <td className="px-4 py-4">
+                                  {Array.isArray(rsvp.selected_events) && rsvp.selected_events.length > 0 ? (
+                                    <div className="flex flex-wrap gap-1 max-w-xs">
+                                      {rsvp.selected_events.map((evId) => {
+                                        const found = events.find((e) => e.id === evId);
+                                        return (
+                                          <span
+                                            key={evId}
+                                            className="px-2 py-0.5 rounded-md bg-gold-100/70 border border-gold-200 text-stone-800 text-[10px] font-medium"
+                                          >
+                                            {found ? found.title : evId}
+                                          </span>
+                                        );
+                                      })}
+                                    </div>
+                                  ) : (
+                                    <span className="text-stone-400 italic">—</span>
+                                  )}
+                                </td>
+
+                                {/* Dietary / Special Notes */}
+                                <td className="px-4 py-4 max-w-xs">
+                                  {rsvp.dietary_requirements && (
+                                    <div className="text-stone-800 font-medium mb-1">
+                                      🍽️ {rsvp.dietary_requirements}
+                                    </div>
+                                  )}
+                                  {rsvp.special_requests && (
+                                    <div className="text-stone-600 italic line-clamp-2">
+                                      “{rsvp.special_requests}”
+                                    </div>
+                                  )}
+                                  {!rsvp.dietary_requirements && !rsvp.special_requests && (
+                                    <span className="text-stone-400 italic">—</span>
+                                  )}
+                                </td>
+
+                                {/* Submitted Date */}
+                                <td className="px-4 py-4 text-stone-500 whitespace-nowrap">
+                                  {new Date(rsvp.created_at).toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}
+                                </td>
+
+                                {/* Actions */}
+                                <td className="px-4 py-4 text-right">
+                                  <button
+                                    onClick={() => handleDeleteRsvp(rsvp.id, rsvp.guest_name)}
+                                    className="p-1.5 text-stone-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                                    title="Delete RSVP"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

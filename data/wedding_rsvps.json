@@ -1,0 +1,51 @@
+[
+  {
+    "id": "2d972c84-01c8-44ab-81db-be902e1f7956",
+    "guest_name": "Kavita Rao",
+    "guest_email": "kavita.rao@example.com",
+    "phone_number": "",
+    "attendance_status": "attending",
+    "attendees_count": 13,
+    "additional_guests": "",
+    "selected_events": [
+      "haldi",
+      "wedding_ceremony"
+    ],
+    "dietary_requirements": "Vegetarian",
+    "special_requests": "Wishing both of you immense happiness!",
+    "ip_address": "::1",
+    "created_at": "2026-10-11T07:34:41.238Z"
+  },
+  {
+    "id": "a126350a-4d6a-4569-9fc6-4cecdbb6203b",
+    "guest_name": "Ananya Reddy",
+    "guest_email": "ananya.reddy@example.com",
+    "phone_number": "+1 (512) 555-0244",
+    "attendance_status": "declined",
+    "attendees_count": 0,
+    "additional_guests": "",
+    "selected_events": [],
+    "dietary_requirements": "",
+    "special_requests": "Sending so much love from London! Wish I could be there.",
+    "ip_address": "::1",
+    "created_at": "2026-10-11T07:28:26.690Z"
+  },
+  {
+    "id": "75a443ae-6aa6-47c1-834c-9d108482cb94",
+    "guest_name": "Dr. Ramesh Sharma",
+    "guest_email": "ramesh.sharma@example.com",
+    "phone_number": "+1 (214) 555-0199",
+    "attendance_status": "attending",
+    "attendees_count": 2,
+    "additional_guests": "Priya Sharma",
+    "selected_events": [
+      "mehendi",
+      "sangeeth",
+      "wedding_ceremony"
+    ],
+    "dietary_requirements": "Strict Vegetarian / No Garlic",
+    "special_requests": "Heartiest congratulations to Yaswanth and Lakshmi!",
+    "ip_address": "::1",
+    "created_at": "2026-10-11T07:28:26.654Z"
+  }
+]

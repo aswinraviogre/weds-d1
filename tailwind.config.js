@@ -1,0 +1,82 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        ivory: {
+          50: '#FDFCF7',
+          100: '#FAF7EE',
+          200: '#F5EFE0',
+          300: '#ECE2CC',
+          400: '#DFD1B0',
+          500: '#CFBC92',
+        },
+        cream: {
+          DEFAULT: '#FAF8F5',
+          light: '#FFFDF9',
+          dark: '#F3ECE2',
+        },
+        gold: {
+          50: '#FAF6EB',
+          100: '#F4E8C9',
+          200: '#ECD596',
+          300: '#E4BF63',
+          400: '#DAA520',
+          500: '#C59B27',
+          600: '#A67D1E',
+          700: '#846016',
+          champagne: '#E5C992',
+          rich: '#D4AF37',
+          metallic: '#C5A059',
+          deep: '#996515',
+        },
+        sage: {
+          50: '#F4F6F4',
+          100: '#E6EAE5',
+          200: '#D0D8CF',
+          300: '#AFC0AD',
+          400: '#8FA58C',
+          500: '#718B6E',
+          600: '#586E55',
+          700: '#435441',
+        },
+        maroon: {
+          50: '#FBF2F3',
+          100: '#F5E1E3',
+          200: '#ECC6CA',
+          300: '#DEA2A9',
+          400: '#C7727E',
+          500: '#AC4A58',
+          600: '#8F3441',
+          700: '#722530',
+          800: '#5A1C25',
+          900: '#48171E',
+          royal: '#5A1827',
+        },
+      },
+      fontFamily: {
+        serif: ['"Cormorant Garamond"', 'serif'],
+        display: ['"Cinzel"', 'serif'],
+        playfair: ['"Playfair Display"', 'serif'],
+        script: ['"Great Vibes"', 'cursive'],
+        sans: ['"Outfit"', 'sans-serif'],
+      },
+      boxShadow: {
+        'luxury': '0 20px 40px -15px rgba(166, 125, 30, 0.12), 0 0 20px 0 rgba(212, 175, 55, 0.08)',
+        'luxury-hover': '0 25px 50px -12px rgba(166, 125, 30, 0.22), 0 0 25px 0 rgba(212, 175, 55, 0.15)',
+        'card': '0 10px 30px -5px rgba(90, 24, 39, 0.05), 0 4px 10px -2px rgba(0, 0, 0, 0.03)',
+      },
+      backgroundImage: {
+        'gold-gradient': 'linear-gradient(135deg, #F5DEB3 0%, #D4AF37 50%, #AA771C 100%)',
+        'gold-shimmer': 'linear-gradient(90deg, #D4AF37 0%, #FFF3D1 50%, #D4AF37 100%)',
+        'ivory-gradient': 'linear-gradient(180deg, #FFFDF9 0%, #FAF6EE 100%)',
+        'maroon-gradient': 'linear-gradient(135deg, #722530 0%, #48171E 100%)',
+      },
+    },
+  },
+  plugins: [],
+};

@@ -1,0 +1,158 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-ivory: #FDFCF7;
+    --color-gold: #D4AF37;
+    --color-gold-light: #F4E8C9;
+    --color-maroon: #5A1827;
+    --color-sage: #718B6E;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #FAF8F5;
+    color: #292524;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  h1, h2, h3, h4, .font-serif-luxury {
+    font-family: 'Cormorant Garamond', serif;
+  }
+}
+
+/* Luxury gold shimmer text */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #B38728 0%, #D4AF37 40%, #F5DEB3 60%, #AA771C 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Ornamental border & separator */
+.ornament-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #C5A059;
+}
+
+.ornament-divider::before,
+.ornament-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #E6D7B8;
+}
+
+.ornament-divider:not(:empty)::before {
+  margin-right: 1.25em;
+}
+
+.ornament-divider:not(:empty)::after {
+  margin-left: 1.25em;
+}
+
+/* Card luxury border */
+.luxury-border-card {
+  position: relative;
+  border: 1px solid #EEDFC3;
+  background: #FFFDF9;
+  box-shadow: 0 10px 30px -5px rgba(90, 24, 39, 0.04), 0 4px 10px -2px rgba(212, 175, 55, 0.06);
+  transition: all 0.3s ease;
+}
+
+.luxury-border-card:hover {
+  border-color: #D4AF37;
+  box-shadow: 0 20px 40px -10px rgba(90, 24, 39, 0.08), 0 0 25px rgba(212, 175, 55, 0.12);
+}
+
+/* Subtle corner flourish */
+.corner-ornament {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-color: #D4AF37;
+  pointer-events: none;
+}
+.corner-tl { top: 8px; left: 8px; border-top: 2px solid; border-left: 2px solid; }
+.corner-tr { top: 8px; right: 8px; border-top: 2px solid; border-right: 2px solid; }
+.corner-bl { bottom: 8px; left: 8px; border-bottom: 2px solid; border-left: 2px solid; }
+.corner-br { bottom: 8px; right: 8px; border-bottom: 2px solid; border-right: 2px solid; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FAF8F5;
+}
+::-webkit-scrollbar-thumb {
+  background: #DFD1B0;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C59B27;
+}
+
+/* Subtle pulsing glow for main ceremony */
+@keyframes goldPulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2), 0 10px 30px -5px rgba(90, 24, 39, 0.08);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.4), 0 15px 35px -5px rgba(90, 24, 39, 0.12);
+  }
+}
+
+.ceremony-glow {
+  animation: goldPulse 4s infinite ease-in-out;
+}
+
+/* 3D Royal Indian Wedding Envelope Styles */
+.perspective-envelope {
+  perspective: 1400px;
+}
+
+.envelope-wrapper {
+  transform-style: preserve-3d;
+}
+
+.envelope-flap-3d {
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  transition: transform 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.envelope-flap-3d.flap-open {
+  transform: rotateX(180deg);
+  z-index: 5 !important;
+}
+
+.envelope-stage-container {
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.invitation-inner-card {
+  transition: transform 0.95s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease, box-shadow 0.95s ease;
+}
+
+@keyframes sealPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.6), 0 8px 25px rgba(0, 0, 0, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 14px rgba(212, 175, 55, 0), 0 14px 35px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.seal-pulse-animation {
+  border-radius: 9999px;
+  animation: sealPulse 2.4s infinite ease-in-out;
+}
+
