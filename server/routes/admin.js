@@ -1,16 +1,26 @@
 import express from 'express';
+import crypto from 'crypto';
 import { db } from '../db.js';
 
 export const adminRouter = express.Router();
 
 const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE || 'yashmrudula2026';
 
-// Middleware to authenticate admin requests
+// Middleware to authenticate admin requests with timing-safe comparison
 function requireAdminAuth(req, res, next) {
-  const providedPasscode =
+  const rawPasscode =
     req.headers['x-admin-passcode'] || req.query.passcode || req.body?.passcode;
 
-  if (!providedPasscode || providedPasscode !== ADMIN_PASSCODE) {
+  if (!rawPasscode || typeof rawPasscode !== 'string') {
+    return res.status(401).json({
+      error: 'Unauthorized: Invalid or missing administrator passcode.',
+    });
+  }
+
+  const provided = Buffer.from(rawPasscode);
+  const expected = Buffer.from(ADMIN_PASSCODE);
+
+  if (provided.length !== expected.length || !crypto.timingSafeEqual(provided, expected)) {
     return res.status(401).json({
       error: 'Unauthorized: Invalid or missing administrator passcode.',
     });
@@ -23,9 +33,13 @@ function requireAdminAuth(req, res, next) {
  * Check if the provided passcode is valid
  */
 adminRouter.post('/verify', (req, res) => {
-  const { passcode } = req.body;
-  if (passcode === ADMIN_PASSCODE) {
-    return res.json({ success: true, message: 'Authenticated' });
+  const { passcode } = req.body || {};
+  if (passcode && typeof passcode === 'string') {
+    const provided = Buffer.from(passcode);
+    const expected = Buffer.from(ADMIN_PASSCODE);
+    if (provided.length === expected.length && crypto.timingSafeEqual(provided, expected)) {
+      return res.json({ success: true, message: 'Authenticated' });
+    }
   }
   return res.status(401).json({ success: false, error: 'Incorrect administrator passcode.' });
 });
@@ -81,24 +95,27 @@ adminRouter.get('/rsvps', requireAdminAuth, async (req, res) => {
       });
     }
 
-    // Filter by search string (name, email, phone)
+    // Filter by search string (name, email, phone, additional guests, dietary, wishes)
     if (search && typeof search === 'string' && search.trim() !== '') {
       const q = search.trim().toLowerCase();
       rsvps = rsvps.filter(
         (r) =>
-          r.guest_name.toLowerCase().includes(q) ||
-          r.guest_email.toLowerCase().includes(q) ||
-          (r.phone_number && r.phone_number.toLowerCase().includes(q))
+          (r.guest_name && r.guest_name.toLowerCase().includes(q)) ||
+          (r.guest_email && r.guest_email.toLowerCase().includes(q)) ||
+          (r.phone_number && r.phone_number.toLowerCase().includes(q)) ||
+          (r.additional_guests && r.additional_guests.toLowerCase().includes(q)) ||
+          (r.dietary_requirements && r.dietary_requirements.toLowerCase().includes(q)) ||
+          (r.special_requests && r.special_requests.toLowerCase().includes(q))
       );
     }
 
     // Sort order (default: newest first)
     if (sort === 'oldest') {
-      rsvps.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      rsvps.sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
     } else if (sort === 'name') {
-      rsvps.sort((a, b) => a.guest_name.localeCompare(b.guest_name));
+      rsvps.sort((a, b) => (a.guest_name || '').localeCompare(b.guest_name || ''));
     } else {
-      rsvps.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      rsvps.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
     }
 
     return res.json({ success: true, data: rsvps });

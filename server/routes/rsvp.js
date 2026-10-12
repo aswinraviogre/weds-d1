@@ -9,9 +9,13 @@ export const rsvpRouter = express.Router();
 const rateLimitMap = new Map();
 
 function isRateLimited(ip) {
+  // Never rate-limit localhost in dev/test
+  if (ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
+    return false;
+  }
   const now = Date.now();
   const windowMs = 15 * 60 * 1000; // 15 minutes
-  const maxRequests = 10; // max 10 submissions per 15 minutes
+  const maxRequests = 30; // max 30 submissions per 15 minutes for family groups
 
   const timestamps = rateLimitMap.get(ip) || [];
   const validTimestamps = timestamps.filter((t) => now - t < windowMs);
@@ -104,6 +108,7 @@ rsvpRouter.post('/', async (req, res) => {
 
     // Prepare payload
     const rsvpData = {
+      ...(req.body.id ? { id: req.body.id } : {}),
       guest_name: cleanName,
       guest_email: cleanEmail,
       phone_number: validatedPhone,
@@ -132,11 +137,7 @@ rsvpRouter.post('/', async (req, res) => {
     return res.status(201).json({
       success: true,
       message: 'RSVP saved successfully',
-      data: {
-        id: savedRecord.id,
-        guest_name: savedRecord.guest_name,
-        attendance_status: savedRecord.attendance_status,
-      },
+      data: savedRecord,
     });
   } catch (err) {
     console.error('[RSVP Route] Unexpected server error:', err);

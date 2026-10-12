@@ -135,22 +135,40 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
         throw new Error(result.error || 'Failed to submit RSVP. Please try again.');
       }
 
+      const confirmedRecord = result.data || {
+        ...payload,
+        id: `local-${Date.now()}`,
+        created_at: new Date().toISOString(),
+      };
+
       // Save client-side backup in localStorage
       try {
         const clientSaved = JSON.parse(localStorage.getItem('wedding_client_rsvps') || '[]');
         clientSaved.unshift({
-          ...payload,
-          id: result.data?.id || `local-${Date.now()}`,
-          created_at: new Date().toISOString(),
+          ...confirmedRecord,
+          _pendingSync: false,
         });
         localStorage.setItem('wedding_client_rsvps', JSON.stringify(clientSaved.slice(0, 50)));
+      } catch (e) {}
+
+      // Trigger instant real-time sync across components and open tabs
+      try {
+        window.dispatchEvent(
+          new CustomEvent('wedding-rsvp-updated', { detail: confirmedRecord })
+        );
+        localStorage.setItem('wedding_last_rsvp_sync', Date.now().toString());
+        if (typeof BroadcastChannel !== 'undefined') {
+          const channel = new BroadcastChannel('wedding_rsvp_channel');
+          channel.postMessage({ type: 'RSVP_SUBMITTED', data: confirmedRecord });
+          channel.close();
+        }
       } catch (e) {}
 
       // Successful submission callback
       if (onSuccessSubmission) {
         onSuccessSubmission({
-          guest_name: formData.guest_name,
-          attendance_status: formData.attendance_status,
+          guest_name: payload.guest_name,
+          attendance_status: payload.attendance_status,
         });
       }
 
@@ -170,6 +188,23 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
     } catch (err) {
       console.error('RSVP Submission Error:', err);
       setServerError(err.message || 'A network error occurred. Your details were kept intact.');
+
+      // Zero-data-loss fallback: Save locally as pending-sync so response is never lost
+      try {
+        const clientSaved = JSON.parse(localStorage.getItem('wedding_client_rsvps') || '[]');
+        const pendingRecord = {
+          ...formData,
+          guest_name: formData.guest_name.trim() || 'Valued Guest',
+          guest_email: formData.guest_email.trim(),
+          phone_number: formData.phone_number.trim() ? formData.phone_number.trim() : null,
+          attendees_count: isAttending ? (parseInt(formData.attendees_count, 10) || 1) : 0,
+          id: `pending-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          created_at: new Date().toISOString(),
+          _pendingSync: true,
+        };
+        clientSaved.unshift(pendingRecord);
+        localStorage.setItem('wedding_client_rsvps', JSON.stringify(clientSaved.slice(0, 50)));
+      } catch (e) {}
     } finally {
       setIsSubmitting(false);
     }

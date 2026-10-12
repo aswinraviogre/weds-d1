@@ -39,10 +39,10 @@ export function Hero() {
           {hero.salutation}
         </p>
 
-        {/* Couple's Names - Primary Visual Focus in Radiant Royal Gold */}
+        {/* Couple's Names - Primary Visual Focus in Radiant Royal Gold (Full Names on First Page) */}
         <div className="my-2 sm:my-4 flex flex-col items-center max-w-full px-2">
           <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-tight text-center text-transparent bg-clip-text bg-gradient-to-b from-[#FFFDF0] via-[#FFD77D] to-[#D49E35] filter drop-shadow-[0_4px_18px_rgba(0,0,0,0.95)] drop-shadow-[0_0_24px_rgba(201,146,47,0.45)]">
-            {couple.groom}
+            {couple.groomFull || couple.groom}
           </h1>
           <div className="flex items-center justify-center my-1 sm:my-2">
             <span className="w-10 sm:w-20 h-[1.5px] bg-gradient-to-r from-transparent via-brass-glow to-brass mr-3 sm:mr-4" />
@@ -52,7 +52,7 @@ export function Hero() {
             <span className="w-10 sm:w-20 h-[1.5px] bg-gradient-to-l from-transparent via-brass-glow to-brass ml-3 sm:mr-4" />
           </div>
           <h2 className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-tight text-center text-transparent bg-clip-text bg-gradient-to-b from-[#FFFDF0] via-[#FFD77D] to-[#D49E35] filter drop-shadow-[0_4px_18px_rgba(0,0,0,0.95)] drop-shadow-[0_0_24px_rgba(201,146,47,0.45)]">
-            {couple.bride}
+            {couple.brideFull || couple.bride}
           </h2>
         </div>
 

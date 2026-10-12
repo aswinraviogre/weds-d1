@@ -65,6 +65,36 @@ export function AdminDashboard({ isOpen, onClose }) {
   const [eventFilter, setEventFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState('newest');
 
+  // Sync any offline submissions that were stored with _pendingSync
+  const syncPendingSubmissions = async () => {
+    try {
+      const clientSaved = JSON.parse(localStorage.getItem('wedding_client_rsvps') || '[]');
+      const pending = clientSaved.filter((r) => r && r._pendingSync);
+      if (pending.length === 0) return;
+
+      let hasChanges = false;
+      for (const item of pending) {
+        try {
+          const res = await fetch('/api/rsvp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(item),
+          });
+          const result = await res.json();
+          if (res.ok && result.success) {
+            item._pendingSync = false;
+            if (result.data?.id) item.id = result.data.id;
+            hasChanges = true;
+          }
+        } catch (e) {}
+      }
+
+      if (hasChanges) {
+        localStorage.setItem('wedding_client_rsvps', JSON.stringify(clientSaved));
+      }
+    } catch (e) {}
+  };
+
   // Load stats and RSVPs once authenticated
   const loadDashboardData = async (activePasscode) => {
     const code =
@@ -74,12 +104,20 @@ export function AdminDashboard({ isOpen, onClose }) {
       '';
     if (!code) return;
 
+    // First ensure any pending offline submissions are synced to backend
+    await syncPendingSubmissions();
+
     setIsLoadingData(true);
     try {
       // 1. Fetch Stats
       const statsRes = await fetch('/api/admin/stats', {
         headers: { 'x-admin-passcode': code },
       });
+      if (statsRes.status === 401) {
+        setIsAuthenticated(false);
+        setAuthError('Session expired. Please enter the administrator passcode again.');
+        return;
+      }
       const statsData = await statsRes.json();
       if (statsRes.ok && statsData.success) {
         setStats(statsData.data);
@@ -99,20 +137,53 @@ export function AdminDashboard({ isOpen, onClose }) {
       const rsvpsRes = await fetch(`/api/admin/rsvps?${params.toString()}`, {
         headers: { 'x-admin-passcode': code },
       });
+      if (rsvpsRes.status === 401) {
+        setIsAuthenticated(false);
+        setAuthError('Session expired. Please enter the administrator passcode again.');
+        return;
+      }
       const rsvpsData = await rsvpsRes.json();
       if (rsvpsRes.ok && rsvpsData.success && Array.isArray(rsvpsData.data)) {
         let mergedList = [...rsvpsData.data];
         try {
+          const deletedIds = new Set(
+            JSON.parse(localStorage.getItem('wedding_deleted_ids') || '[]')
+          );
+          // Never display deleted entries
+          mergedList = mergedList.filter((r) => r && r.id && !deletedIds.has(r.id));
+
           const clientSaved = JSON.parse(localStorage.getItem('wedding_client_rsvps') || '[]');
           if (Array.isArray(clientSaved) && clientSaved.length > 0) {
             const existingIds = new Set(
-              mergedList.map((r) => r.id || `${r.guest_email}_${r.guest_name}`)
+              mergedList.map((r) => r.id).filter(Boolean)
             );
             for (const clientRsvp of clientSaved) {
-              const key = clientRsvp.id || `${clientRsvp.guest_email}_${clientRsvp.guest_name}`;
-              if (!existingIds.has(key)) {
+              if (!clientRsvp || !clientRsvp.id || deletedIds.has(clientRsvp.id)) {
+                continue;
+              }
+              if (!existingIds.has(clientRsvp.id)) {
+                // Apply active filters so client cache doesn't contaminate filter results
+                if (statusFilter !== 'all' && clientRsvp.attendance_status !== statusFilter) {
+                  continue;
+                }
+                if (eventFilter !== 'all') {
+                  const evs = Array.isArray(clientRsvp.selected_events) ? clientRsvp.selected_events : [];
+                  if (!evs.includes(eventFilter)) {
+                    continue;
+                  }
+                }
+                if (searchQuery && searchQuery.trim() !== '') {
+                  const q = searchQuery.trim().toLowerCase();
+                  const nameMatch = (clientRsvp.guest_name || '').toLowerCase().includes(q);
+                  const emailMatch = (clientRsvp.guest_email || '').toLowerCase().includes(q);
+                  const phoneMatch = (clientRsvp.phone_number || '').toLowerCase().includes(q);
+                  const addMatch = (clientRsvp.additional_guests || '').toLowerCase().includes(q);
+                  if (!nameMatch && !emailMatch && !phoneMatch && !addMatch) {
+                    continue;
+                  }
+                }
                 mergedList.unshift(clientRsvp);
-                existingIds.add(key);
+                existingIds.add(clientRsvp.id);
               }
             }
           }
@@ -167,7 +238,7 @@ export function AdminDashboard({ isOpen, onClose }) {
     setPasscode('');
   };
 
-  // Automatically load on mount or when dashboard opens
+  // 1. Initial load on mount, modal opening, or filter change
   useEffect(() => {
     const savedPasscode =
       typeof localStorage !== 'undefined' ? localStorage.getItem('wedding_admin_passcode') : null;
@@ -176,8 +247,48 @@ export function AdminDashboard({ isOpen, onClose }) {
     }
   }, [isOpen, searchQuery, statusFilter, eventFilter, sortOrder]);
 
+  // 2. Real-time instant sync via CustomEvent, BroadcastChannel, storage events & polling
+  useEffect(() => {
+    if (!isOpen || !isAuthenticated) return;
+
+    const handleSync = () => {
+      loadDashboardData();
+    };
+
+    window.addEventListener('wedding-rsvp-updated', handleSync);
+    window.addEventListener('storage', handleSync);
+
+    let channel;
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        channel = new BroadcastChannel('wedding_rsvp_channel');
+        channel.onmessage = (e) => {
+          if (e.data?.type === 'RSVP_SUBMITTED') {
+            loadDashboardData();
+          }
+        };
+      }
+    } catch (e) {}
+
+    // Multi-device poll interval (syncs changes from other guests/devices every 5 seconds)
+    const pollInterval = setInterval(() => {
+      loadDashboardData();
+    }, 5000);
+
+    return () => {
+      window.removeEventListener('wedding-rsvp-updated', handleSync);
+      window.removeEventListener('storage', handleSync);
+      if (channel) channel.close();
+      clearInterval(pollInterval);
+    };
+  }, [isOpen, isAuthenticated, passcode, searchQuery, statusFilter, eventFilter, sortOrder]);
+
   const handleExportCsv = () => {
-    window.location.href = `/api/admin/export?passcode=${encodeURIComponent(passcode)}`;
+    const code =
+      passcode ||
+      (typeof localStorage !== 'undefined' ? localStorage.getItem('wedding_admin_passcode') : '') ||
+      '';
+    window.location.href = `/api/admin/export?passcode=${encodeURIComponent(code)}`;
   };
 
   const handleDeleteRsvp = async (id, name) => {
@@ -186,13 +297,42 @@ export function AdminDashboard({ isOpen, onClose }) {
     }
 
     try {
+      const code =
+        passcode ||
+        (typeof localStorage !== 'undefined' ? localStorage.getItem('wedding_admin_passcode') : '') ||
+        '';
+
       const res = await fetch(`/api/admin/rsvps/${id}`, {
         method: 'DELETE',
-        headers: { 'x-admin-passcode': passcode },
+        headers: { 'x-admin-passcode': code },
       });
 
       if (res.ok) {
-        loadDashboardData();
+        // Record deleted ID in tombstone list so it never resurrects from client cache
+        try {
+          const deletedIds = JSON.parse(localStorage.getItem('wedding_deleted_ids') || '[]');
+          if (!deletedIds.includes(id)) {
+            deletedIds.push(id);
+            localStorage.setItem('wedding_deleted_ids', JSON.stringify(deletedIds.slice(-200)));
+          }
+
+          const clientSaved = JSON.parse(localStorage.getItem('wedding_client_rsvps') || '[]');
+          const updatedClient = clientSaved.filter((r) => r.id !== id);
+          localStorage.setItem('wedding_client_rsvps', JSON.stringify(updatedClient));
+
+          const cachedList = JSON.parse(localStorage.getItem('wedding_cached_rsvps') || '[]');
+          const updatedCached = cachedList.filter((r) => r.id !== id);
+          localStorage.setItem('wedding_cached_rsvps', JSON.stringify(updatedCached));
+        } catch (e) {}
+
+        // Optimistically update local view
+        setRsvps((prev) => prev.filter((r) => r.id !== id));
+
+        // Re-fetch fresh stats & verified dataset
+        loadDashboardData(code);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || 'Failed to delete RSVP record.');
       }
     } catch (err) {
       alert('Failed to delete RSVP record.');
@@ -512,11 +652,20 @@ export function AdminDashboard({ isOpen, onClose }) {
                                       {rsvp.selected_events.map((evId) => {
                                         const found =
                                           events.find((e) => e.id === evId) ||
-                                          (evId === 'haldi' || evId === 'pelli_ceremony'
-                                            ? events.find((e) => e.id === 'haldi_pelli')
+                                          (evId === 'wedding_ceremony'
+                                            ? events.find((e) => e.id === 'wedding')
                                             : null) ||
-                                          (evId === 'mehendi' || evId === 'sangeeth'
-                                            ? events.find((e) => e.id === 'mehendi_sangeeth')
+                                          (evId === 'pelli_ceremony' || evId === 'pelli_rituals'
+                                            ? events.find((e) => e.id === 'pelli_rituals')
+                                            : null) ||
+                                          (evId === 'haldi' || evId === 'haldi_pelli'
+                                            ? events.find((e) => e.id === 'haldi')
+                                            : null) ||
+                                          (evId === 'mehendi' || evId === 'mehendi_sangeeth'
+                                            ? events.find((e) => e.id === 'mehendi')
+                                            : null) ||
+                                          (evId === 'sangeeth'
+                                            ? events.find((e) => e.id === 'sangeeth')
                                             : null);
                                         return (
                                           <span

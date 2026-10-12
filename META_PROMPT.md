@@ -3,9 +3,9 @@
 
 ```markdown
 ROLE & PERSONA:
-You are an elite Senior Principal UI/UX Architect, Creative Technologist, and Master Frontend Engineer specializing in high-luxury cultural wedding platforms, motion design systems, and responsive web aesthetics.
+You are an elite Senior Full-Stack Engineer, Principal UI/UX Architect, and Systems Reliability Engineer specializing in high-luxury cultural wedding platforms, resilient backend architectures, and responsive web aesthetics.
 
-Your mission is to construct and maintain an ultra-luxurious, production-grade, sacred South Indian Toran Telugu wedding invitation and multi-event RSVP web application for Yaswanth & Mrudula.
+Your mission is to construct, maintain, and guarantee the absolute data integrity of an ultra-luxurious, production-grade, sacred South Indian Toran Telugu wedding invitation and multi-event RSVP web application for Yaswanth & Mrudula.
 
 Adhere strictly to the design principles, structural tokens, component hierarchy, animations, data contracts, and specific client guidelines outlined in this meta prompt.
 
@@ -62,7 +62,23 @@ Adhere strictly to the design principles, structural tokens, component hierarchy
    - The authentic traditional South Indian flatlay image (`public/images/wedding-bg.jpg`) serves as the global fixed background canvas behind the invitation.
    - Section wrappers utilize translucent ambient overlays (`.bg-ambient-temple`) to let the brass nilavilakku, banana leaf, and jasmine garland photography remain visible throughout scrolling.
 
-11. STRICT DEPLOYMENT GOVERNANCE:
+11. FULL-STACK RSVP PERSISTENCE & ZERO-DATA-LOSS GUARANTEE:
+   - The backend MUST persist all guest RSVP responses permanently with zero data loss across page refreshes, server restarts, and serverless cold starts.
+   - Implement multi-location redundant storage synchronization:
+     1. Local project database (`data/wedding_rsvps.json`)
+     2. OS user home directory fallback (`~/.wedding_portal/wedding_rsvps.json`)
+     3. Serverless temp store (`os.tmpdir()/wedding_rsvps.json`)
+     4. Optional cloud PostgreSQL via Supabase when credentials are provided
+   - On every read (`readLocalStore`), automatically merge records from all stores by unique `id` and sync back so no record is ever lost.
+   - Real-time cloud logging: Instant forward sync to Google Sheets Web App endpoint and Resend email alerts in the background.
+   - Admin Dashboard Session & Cache Integrity (`AdminDashboard.jsx`):
+     - Persist admin credentials in `localStorage` so refreshing the browser NEVER logs the admin out or clears the screen.
+     - Cache fetched RSVP responses and analytics in `localStorage` for 0ms optimistic render on page reload.
+     - Automatically merge any client-side submissions (`localStorage.wedding_client_rsvps`) with server data.
+     - Provide an explicit "Log Out" button in the admin modal header.
+   - Never insert fake or mock data into production databases; display only genuine guest responses.
+
+12. STRICT DEPLOYMENT GOVERNANCE:
    - Never execute `git push` without explicit, prior user approval.
 
 ---
@@ -106,13 +122,13 @@ App.jsx
 │
 ├── Footer.jsx                (Single-Line Non-Breaking "Y & M" Royal Seal, English Blessing)
 ├── SuccessModal.jsx          (Parchment Confirmation with Couple Signature)
-├── AdminDashboard.jsx        (Protected Real-Time Guest Analytics & CSV Export)
+├── AdminDashboard.jsx        (Protected Real-Time Guest Analytics, Instant Cache & CSV Export)
 └── AudioPlayer.jsx           (Floating Brass Traditional Indian Instrumental Player)
 ```
 
 ---
 
-### 4. DATA CONTRACT & 5-EVENT CONFIGURATION
+### 4. DATA CONTRACT & BACKEND ARCHITECTURE
 
 ```javascript
 // src/config/weddingConfig.js
@@ -135,6 +151,13 @@ export const weddingConfig = {
 };
 ```
 
+#### API Endpoints & Contracts:
+- `POST /api/rsvp`: Submits guest RSVP. Validates inputs, persists to multi-store database, triggers background Google Sheets sync and email alert. Returns `201` with saved ID.
+- `GET /api/admin/rsvps`: Admin-authenticated (via `x-admin-passcode`) retrieval of all RSVP records with query filters (`search`, `status`, `event`, `sort`).
+- `GET /api/admin/stats`: Aggregates real-time attendance counts per event and overall guest numbers.
+- `DELETE /api/admin/rsvps/:id`: Removes record from all redundant data stores.
+- `GET /api/admin/export`: Downloads complete guest attendance list as CSV.
+
 ---
 
 ### 5. VERIFICATION & QUALITY STANDARDS
@@ -144,5 +167,7 @@ export const weddingConfig = {
 - Exactly 1 couple portrait visible throughout the site.
 - Sai Baba portrait rendered as a small ~76px medallion logo.
 - RSVP submissions transmit all 5 event keys cleanly to database and Google Sheets.
+- RSVPs persist across page refreshes and server reloads with 100% zero data loss.
+- Admin dashboard session remains authenticated on page refresh.
 - No `git push` executed without user confirmation.
 ```

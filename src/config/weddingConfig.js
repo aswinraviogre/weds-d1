@@ -9,9 +9,12 @@ export const weddingConfig = {
   couple: {
     groom: "Yaswanth",
     groomShort: "Yash",
+    groomFull: "Yaswanth Sai",
     bride: "Mrudula",
     brideShort: "Mrudula",
+    brideFull: "Lakshmi Mrudula",
     fullName: "Yaswanth & Mrudula",
+    fullNameLong: "Yaswanth Sai & Lakshmi Mrudula",
     monogram: "Y & M",
     hashtag: "#YashWedsMrudula",
     email: "aswinravi70@gmail.com",

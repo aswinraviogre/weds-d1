@@ -16,6 +16,14 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// Handle malformed JSON body
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ error: 'Malformed JSON payload.' });
+  }
+  next();
+});
+
 // API Routes
 app.use('/api/rsvp', rsvpRouter);
 app.use('/api/admin', adminRouter);

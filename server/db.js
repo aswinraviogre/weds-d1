@@ -39,8 +39,8 @@ try {
 globalThis.__weddingRsvpsCache = globalThis.__weddingRsvpsCache || null;
 
 // Check Supabase credentials
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.SUPABASE_URL ? process.env.SUPABASE_URL.trim() : '';
+const supabaseKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '').trim();
 const isSupabaseConfigured = Boolean(supabaseUrl && supabaseKey);
 
 let supabase = null;
@@ -58,7 +58,10 @@ if (isSupabaseConfigured) {
   console.log('[Database] Supabase credentials not found. Using local/tmp persistent storage.');
 }
 
-// Helper for writing local JSON store to all redundant locations
+// In-memory set of deleted IDs (tombstones) to prevent revived deleted records across candidate files
+const tombstoneIds = new Set();
+
+// Helper for writing local JSON store to all redundant locations with atomic writes
 function writeLocalStore(records) {
   globalThis.__weddingRsvpsCache = records;
   let wroteSuccessfully = false;
@@ -71,10 +74,19 @@ function writeLocalStore(records) {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
-      fs.writeFileSync(filePath, JSON.stringify(records, null, 2), 'utf-8');
+      // Atomic write pattern: write to temporary file first then rename
+      const tempPath = `${filePath}.${Date.now()}.${Math.random().toString(36).slice(2, 6)}.tmp`;
+      fs.writeFileSync(tempPath, JSON.stringify(records, null, 2), 'utf-8');
+      fs.renameSync(tempPath, filePath);
       wroteSuccessfully = true;
     } catch (err) {
-      // Ignored for read-only environments
+      // Direct write fallback if atomic rename is restricted
+      try {
+        fs.writeFileSync(filePath, JSON.stringify(records, null, 2), 'utf-8');
+        wroteSuccessfully = true;
+      } catch (e) {
+        // Ignored for read-only environments
+      }
     }
   }
 
@@ -93,7 +105,7 @@ function readLocalStore() {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
           for (const item of parsed) {
-            if (item && item.id && !recordsMap.has(item.id)) {
+            if (item && item.id && !tombstoneIds.has(item.id) && !recordsMap.has(item.id)) {
               recordsMap.set(item.id, item);
             }
           }
@@ -107,7 +119,7 @@ function readLocalStore() {
   // Also include in-memory cache if any items exist
   if (Array.isArray(globalThis.__weddingRsvpsCache)) {
     for (const item of globalThis.__weddingRsvpsCache) {
-      if (item && item.id && !recordsMap.has(item.id)) {
+      if (item && item.id && !tombstoneIds.has(item.id) && !recordsMap.has(item.id)) {
         recordsMap.set(item.id, item);
       }
     }
@@ -138,19 +150,27 @@ export const db = {
    * Save a new RSVP record
    */
   async saveRsvp(rsvpData) {
+    const recordId =
+      rsvpData.id &&
+      typeof rsvpData.id === 'string' &&
+      !rsvpData.id.startsWith('pending-') &&
+      !rsvpData.id.startsWith('local-')
+        ? rsvpData.id
+        : crypto.randomUUID();
+
     const record = {
-      id: crypto.randomUUID(),
+      id: recordId,
       guest_name: (rsvpData.guest_name && String(rsvpData.guest_name).trim()) || 'Valued Guest',
       guest_email: (rsvpData.guest_email && String(rsvpData.guest_email).trim().toLowerCase()) || '',
       phone_number: rsvpData.phone_number && String(rsvpData.phone_number).trim() ? String(rsvpData.phone_number).trim() : null,
-      attendance_status: rsvpData.attendance_status, // 'attending' | 'declined'
+      attendance_status: rsvpData.attendance_status === 'declined' ? 'declined' : 'attending',
       attendees_count: rsvpData.attendance_status === 'attending' ? parseInt(rsvpData.attendees_count, 10) || 1 : 0,
-      additional_guests: rsvpData.additional_guests ? rsvpData.additional_guests.trim() : '',
+      additional_guests: rsvpData.additional_guests ? String(rsvpData.additional_guests).trim() : '',
       selected_events: Array.isArray(rsvpData.selected_events) ? rsvpData.selected_events : [],
-      dietary_requirements: rsvpData.dietary_requirements ? rsvpData.dietary_requirements.trim() : '',
-      special_requests: rsvpData.special_requests ? rsvpData.special_requests.trim() : '',
+      dietary_requirements: rsvpData.dietary_requirements ? String(rsvpData.dietary_requirements).trim() : '',
+      special_requests: rsvpData.special_requests ? String(rsvpData.special_requests).trim() : '',
       ip_address: rsvpData.ip_address || 'unknown',
-      created_at: new Date().toISOString(),
+      created_at: rsvpData.created_at || new Date().toISOString(),
     };
 
     // If Supabase is active, persist to cloud PostgreSQL
@@ -162,8 +182,10 @@ export const db = {
         } else {
           console.log('[Database] Saved RSVP to Supabase:', data.id);
           const current = readLocalStore();
-          current.unshift(record);
-          writeLocalStore(current);
+          // Avoid duplicate in local store
+          const filtered = current.filter((r) => r.id !== record.id);
+          filtered.unshift(record);
+          writeLocalStore(filtered);
           return record;
         }
       } catch (err) {
@@ -173,8 +195,9 @@ export const db = {
 
     // Default or fallback: Save to local persistent JSON file / tmp store
     const records = readLocalStore();
-    records.unshift(record);
-    writeLocalStore(records);
+    const filtered = records.filter((r) => r.id !== record.id);
+    filtered.unshift(record);
+    writeLocalStore(filtered);
     console.log('[Database] Saved RSVP to database:', record.id, record.guest_name);
     return record;
   },
@@ -190,7 +213,7 @@ export const db = {
           .select('*')
           .order('created_at', { ascending: false });
         if (!error && Array.isArray(data)) {
-          return data;
+          return data.filter((r) => !tombstoneIds.has(r.id));
         }
       } catch (err) {
         console.warn('[Database] Supabase fetch error, using local store:', err.message);
@@ -266,6 +289,8 @@ export const db = {
    * Delete RSVP by ID (Admin only)
    */
   async deleteRsvp(id) {
+    tombstoneIds.add(id);
+
     if (supabase) {
       try {
         await supabase.from('rsvps').delete().eq('id', id);
