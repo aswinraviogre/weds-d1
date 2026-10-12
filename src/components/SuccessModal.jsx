@@ -8,13 +8,13 @@ export function SuccessModal({ isOpen, onClose, submissionData }) {
 
   useEffect(() => {
     if (isOpen) {
-      // Fire celebratory confetti in gold, maroon, and champagne colors
+      // Fire celebratory confetti in brass gold, temple maroon, and champagne colors
       try {
         confetti({
-          particleCount: 80,
-          spread: 70,
+          particleCount: 90,
+          spread: 80,
           origin: { y: 0.6 },
-          colors: ['#D4AF37', '#5A1827', '#E5C992', '#8FA58C'],
+          colors: ['#C9922F', '#7B1F2B', '#FFCF5C', '#1F6B4A', '#FFF6D8'],
         });
       } catch (err) {
         // Safe fallback if canvas not available
@@ -25,16 +25,16 @@ export function SuccessModal({ isOpen, onClose, submissionData }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/70 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-maroon-night/85 backdrop-blur-md animate-fade-in">
       <div
-        className="relative w-full max-w-lg bg-cream-light rounded-3xl p-8 sm:p-12 text-center border-2 border-gold-rich shadow-luxury"
+        className="relative w-full max-w-lg paper-cut-card bg-paper rounded-3xl p-8 sm:p-12 text-center border-2 border-brass shadow-2xl text-ink"
         role="dialog"
         aria-modal="true"
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-stone-400 hover:text-stone-700 rounded-full hover:bg-gold-50 transition-colors"
+          className="absolute top-4 right-4 p-2 text-ink/50 hover:text-ink rounded-full hover:bg-paper-warm transition-colors cursor-pointer"
           aria-label="Close confirmation dialog"
         >
           <X className="w-5 h-5" />
@@ -47,43 +47,43 @@ export function SuccessModal({ isOpen, onClose, submissionData }) {
         <div className="corner-ornament corner-br" />
 
         {/* Central Icon */}
-        <div className="w-16 h-16 rounded-full bg-gold-100/80 border-2 border-gold-rich flex items-center justify-center mx-auto mb-6 text-maroon-royal shadow-sm">
-          <Heart className="w-8 h-8 fill-maroon-royal animate-pulse" />
+        <div className="w-16 h-16 rounded-full bg-paper-warm border-2 border-brass flex items-center justify-center mx-auto mb-6 text-maroon-deep shadow-sm">
+          <Heart className="w-8 h-8 fill-maroon-temple text-maroon-temple animate-pulse" />
         </div>
 
         {/* Exact Required Title */}
-        <h3 className="font-serif text-2xl sm:text-3xl font-bold text-maroon-royal mb-2">
+        <h3 className="font-serif text-2xl sm:text-3xl font-bold text-maroon-deep mb-2">
           {rsvpConfirmation.title}
         </h3>
 
         {/* Exact Required Subtitle */}
-        <p className="text-sm font-semibold uppercase tracking-widest text-gold-deep mb-4">
+        <p className="text-sm font-semibold uppercase tracking-widest text-maroon-temple mb-4">
           {rsvpConfirmation.subtitle}
         </p>
 
-        <div className="w-16 h-0.5 bg-gold-rich mx-auto mb-6" />
+        <div className="w-16 h-0.5 bg-brass mx-auto mb-6" />
 
         {/* Exact Required Body */}
-        <p className="text-stone-700 text-base sm:text-lg leading-relaxed mb-6 font-light">
+        <p className="text-ink/85 text-base sm:text-lg leading-relaxed mb-6 font-light">
           {rsvpConfirmation.body}
         </p>
 
         {/* Guest acknowledgment tag */}
         {submissionData && (
-          <div className="inline-block px-4 py-1.5 rounded-full bg-gold-50 border border-gold-200 text-xs text-stone-600 mb-6">
-            Response recorded for <strong className="text-maroon-royal">{submissionData.guest_name}</strong>
+          <div className="inline-block px-4 py-1.5 rounded-full bg-paper-warm border border-brass/40 text-xs text-ink/75 mb-6">
+            Response recorded for <strong className="text-maroon-deep">{submissionData.guest_name}</strong>
           </div>
         )}
 
-        {/* Exact Required Signature */}
-        <div className="font-script text-3xl sm:text-4xl text-maroon-royal mb-8">
-          Yaswanth Sai &amp; Lakshmi Mrudula
+        {/* Exact Signature */}
+        <div className="font-script text-3xl sm:text-4xl text-maroon-deep mb-8">
+          Yaswanth &amp; Mrudula
         </div>
 
         <div>
           <button
             onClick={onClose}
-            className="px-8 py-3 rounded-full bg-maroon-royal hover:bg-maroon-800 text-ivory-50 text-xs uppercase tracking-widest font-semibold transition-all shadow-md"
+            className="px-8 py-3 rounded-full bg-maroon-temple hover:bg-maroon-deep text-paper text-xs uppercase tracking-widest font-semibold transition-all shadow-md border border-brass/50 cursor-pointer"
           >
             Return to Invitation
           </button>

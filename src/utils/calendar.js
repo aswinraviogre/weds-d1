@@ -11,13 +11,13 @@ function formatDateToIcsString(isoDateStr) {
 /**
  * Generate Google Calendar URL
  */
-export function createGoogleCalendarUrl(event, coupleName = 'Yaswanth Sai & Lakshmi Mrudula') {
+export function createGoogleCalendarUrl(event, coupleName = 'Yaswanth & Mrudula') {
   const startStr = formatDateToIcsString(event.startIso);
   const endStr = formatDateToIcsString(event.endIso);
 
   const title = encodeURIComponent(`${event.title} — ${coupleName} Wedding`);
   const details = encodeURIComponent(
-    `${event.description}\n\nAttire: ${event.attire || 'Festive Indian Attire'}\n\nRSVP & Details: Yaswanth Sai & Lakshmi Mrudula Wedding Celebrations`
+    `${event.description}\n\nAttire: ${event.attire || 'Festive Indian Attire'}\n\nRSVP & Details: Yaswanth & Mrudula Wedding Celebrations`
   );
   const location = encodeURIComponent(`${event.venue}, ${event.address}`);
 
@@ -27,7 +27,7 @@ export function createGoogleCalendarUrl(event, coupleName = 'Yaswanth Sai & Laks
 /**
  * Generate RFC 5545 compliant ICS file and trigger browser download
  */
-export function downloadIcsFile(event, coupleName = 'Yaswanth Sai & Lakshmi Mrudula') {
+export function downloadIcsFile(event, coupleName = 'Yaswanth & Mrudula') {
   const startStr = formatDateToIcsString(event.startIso);
   const endStr = formatDateToIcsString(event.endIso);
   const nowStr = formatDateToIcsString(new Date().toISOString());

@@ -145,7 +145,7 @@ export function AdminDashboard({ isOpen, onClose }) {
                 Couple's RSVP Administration
               </h2>
               <span className="text-[11px] text-gold-champagne tracking-wider uppercase block">
-                Yaswanth Sai &amp; Lakshmi Mrudula • Private Guest Portal
+                Yaswanth &amp; Mrudula • Private Guest Portal
               </span>
             </div>
           </div>

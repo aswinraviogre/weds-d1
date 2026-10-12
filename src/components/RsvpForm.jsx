@@ -167,41 +167,42 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
   const isAttending = formData.attendance_status === 'attending';
 
   return (
-    <section id="rsvp" className="py-24 px-4 sm:px-6 lg:px-8 bg-cream-dark/30 relative">
+    <section id="rsvp" className="py-24 px-4 sm:px-6 lg:px-8 bg-ambient-temple relative">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center space-x-2 px-4 py-1 rounded-full bg-gold-100 border border-gold-300 text-gold-deep text-xs font-semibold uppercase tracking-[0.2em] mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-gold-rich" />
+          <div className="inline-flex items-center space-x-2 px-5 py-1.5 rounded-full bg-maroon-night/90 border border-brass/55 text-brass-soft text-xs font-semibold uppercase tracking-[0.2em] mb-4 shadow-sm backdrop-blur-md">
+            <Sparkles className="w-3.5 h-3.5 text-brass" />
             <span>Celebrate With Us</span>
+            <Sparkles className="w-3.5 h-3.5 text-brass" />
           </div>
-          <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-maroon-royal mb-3">
+          <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-b from-[#FFFDF0] via-[#FFD77D] to-[#D49E35] filter drop-shadow-[0_4px_14px_rgba(0,0,0,0.9)]">
             Wedding RSVP
           </h2>
-          <div className="w-20 h-0.5 bg-gold-rich mx-auto mb-4" />
-          <p className="text-stone-600 text-sm sm:text-base font-light">
+          <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-brass to-transparent mx-auto mb-4" />
+          <p className="text-paper/95 text-sm sm:text-base font-light drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
             Kindly respond by October 2026. Please let us know which celebrations you will be attending so we can welcome you warmly.
           </p>
         </div>
 
         {/* Server Error Alert Banner */}
         {serverError && (
-          <div className="mb-8 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 flex items-start space-x-3 text-sm">
-            <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+          <div className="mb-8 p-4 rounded-xl bg-red-950/70 border border-red-500 text-red-200 flex items-start space-x-3 text-sm">
+            <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
             <div>
-              <span className="font-semibold block">Submission Error</span>
+              <span className="font-semibold block text-red-300">Submission Error</span>
               <span>{serverError}</span>
             </div>
           </div>
         )}
 
-        {/* Form Container */}
+        {/* Form Container in Paper-Cut Card Aesthetic */}
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="luxury-border-card rounded-3xl p-6 sm:p-10 md:p-12 bg-cream-light relative shadow-luxury"
+          className="paper-cut-card rounded-3xl p-6 sm:p-10 md:p-12 relative shadow-[0_25px_60px_-15px_rgba(15,3,5,0.85),0_0_35px_rgba(201,146,47,0.18)] border border-brass/45 bg-paper text-ink"
         >
-          {/* Indian decorative corner flourishes */}
+          {/* Traditional corner flourishes */}
           <div className="corner-ornament corner-tl" />
           <div className="corner-ornament corner-tr" />
           <div className="corner-ornament corner-bl" />
@@ -209,10 +210,10 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
 
           {/* Section 1: Attendance Decision */}
           <div className="mb-10 text-center">
-            <label className="block font-serif text-2xl sm:text-3xl font-bold text-maroon-royal mb-2">
+            <label className="block font-serif text-2xl sm:text-3xl font-bold text-maroon-deep mb-2">
               Will you be joining us for the celebrations?
             </label>
-            <p className="text-xs uppercase tracking-widest text-gold-deep font-semibold mb-6">
+            <p className="text-xs uppercase tracking-widest text-maroon-temple font-semibold mb-6">
               Please choose your response
             </p>
 
@@ -228,15 +229,15 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                     return next;
                   });
                 }}
-                className={`flex items-center justify-center space-x-3 p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
+                className={`flex items-center justify-center space-x-3 p-4 rounded-2xl border-2 transition-all duration-200 text-left cursor-pointer ${
                   isAttending
-                    ? 'border-emerald-600 bg-emerald-50/80 text-emerald-950 shadow-sm ring-2 ring-emerald-500/20'
-                    : 'border-stone-200 hover:border-gold-300 bg-white text-stone-700'
+                    ? 'border-leaf bg-leaf/10 text-leaf-deep shadow-sm ring-2 ring-leaf/25'
+                    : 'border-brass/30 hover:border-brass bg-paper-parchment text-ink/80'
                 }`}
               >
                 <div
                   className={`w-6 h-6 rounded-full flex items-center justify-center border ${
-                    isAttending ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-stone-300'
+                    isAttending ? 'bg-leaf border-leaf text-white' : 'border-brass/40'
                   }`}
                 >
                   {isAttending && <Check className="w-4 h-4 stroke-[3]" />}
@@ -256,15 +257,15 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                   }));
                   setErrors({});
                 }}
-                className={`flex items-center justify-center space-x-3 p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
+                className={`flex items-center justify-center space-x-3 p-4 rounded-2xl border-2 transition-all duration-200 text-left cursor-pointer ${
                   !isAttending
-                    ? 'border-stone-600 bg-stone-100 text-stone-900 shadow-sm ring-2 ring-stone-400/20'
-                    : 'border-stone-200 hover:border-gold-300 bg-white text-stone-700'
+                    ? 'border-maroon-temple bg-maroon-temple/10 text-maroon-deep shadow-sm ring-2 ring-maroon-temple/25'
+                    : 'border-brass/30 hover:border-brass bg-paper-parchment text-ink/80'
                 }`}
               >
                 <div
                   className={`w-6 h-6 rounded-full flex items-center justify-center border ${
-                    !isAttending ? 'bg-stone-700 border-stone-700 text-white' : 'border-stone-300'
+                    !isAttending ? 'bg-maroon-temple border-maroon-temple text-white' : 'border-brass/40'
                   }`}
                 >
                   {!isAttending && <Check className="w-4 h-4 stroke-[3]" />}
@@ -275,19 +276,19 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
           </div>
 
           {/* Section 2: Guest Contact Information */}
-          <div className="space-y-6 pt-6 border-t border-gold-200/70 mb-10">
-            <h3 className="font-serif text-2xl font-bold text-maroon-royal">
+          <div className="space-y-6 pt-6 border-t border-brass/25 mb-10">
+            <h3 className="font-serif text-2xl font-bold text-maroon-deep">
               Guest Information
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Full Name */}
               <div>
-                <label className="block text-xs uppercase tracking-wider text-stone-700 font-semibold mb-2">
-                  Full Name <span className="text-stone-400 font-normal">(Optional)</span>
+                <label className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2">
+                  Full Name <span className="text-ink/50 font-normal">(Optional)</span>
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-brass-deep">
                     <User className="w-4 h-4" />
                   </div>
                   <input
@@ -300,10 +301,10 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                         setErrors({ ...errors, guest_name: null });
                       }
                     }}
-                    className={`w-full pl-10 pr-4 py-3 rounded-xl border bg-white focus:outline-none focus:ring-2 transition-all text-sm ${
+                    className={`w-full pl-10 pr-4 py-3 rounded-xl border bg-paper-parchment focus:outline-none focus:ring-2 transition-all text-sm text-ink ${
                       errors.guest_name
                         ? 'border-red-400 focus:ring-red-200'
-                        : 'border-gold-200 focus:border-gold-rich focus:ring-gold-100'
+                        : 'border-brass/40 focus:border-brass focus:ring-brass/20'
                     }`}
                   />
                 </div>
@@ -317,11 +318,11 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
 
               {/* Email Address */}
               <div>
-                <label className="block text-xs uppercase tracking-wider text-stone-700 font-semibold mb-2">
-                  Email Address <span className="text-stone-400 font-normal">(Optional)</span>
+                <label className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2">
+                  Email Address <span className="text-ink/50 font-normal">(Optional)</span>
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-brass-deep">
                     <Mail className="w-4 h-4" />
                   </div>
                   <input
@@ -334,10 +335,10 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                         setErrors({ ...errors, guest_email: null });
                       }
                     }}
-                    className={`w-full pl-10 pr-4 py-3 rounded-xl border bg-white focus:outline-none focus:ring-2 transition-all text-sm ${
+                    className={`w-full pl-10 pr-4 py-3 rounded-xl border bg-paper-parchment focus:outline-none focus:ring-2 transition-all text-sm text-ink ${
                       errors.guest_email
                         ? 'border-red-400 focus:ring-red-200'
-                        : 'border-gold-200 focus:border-gold-rich focus:ring-gold-100'
+                        : 'border-brass/40 focus:border-brass focus:ring-brass/20'
                     }`}
                   />
                 </div>
@@ -351,11 +352,11 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
 
               {/* Phone Number (Optional) */}
               <div>
-                <label className="block text-xs uppercase tracking-wider text-stone-700 font-semibold mb-2">
-                  Phone Number <span className="text-stone-400 font-normal">(Optional)</span>
+                <label className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2">
+                  Phone Number <span className="text-ink/50 font-normal">(Optional)</span>
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-brass-deep">
                     <Phone className="w-4 h-4" />
                   </div>
                   <input
@@ -368,10 +369,10 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                         setErrors({ ...errors, phone_number: null });
                       }
                     }}
-                    className={`w-full pl-10 pr-4 py-3 rounded-xl border bg-white focus:outline-none focus:ring-2 transition-all text-sm ${
+                    className={`w-full pl-10 pr-4 py-3 rounded-xl border bg-paper-parchment focus:outline-none focus:ring-2 transition-all text-sm text-ink ${
                       errors.phone_number
                         ? 'border-red-400 focus:ring-red-200'
-                        : 'border-gold-200 focus:border-gold-rich focus:ring-gold-100'
+                        : 'border-brass/40 focus:border-brass focus:ring-brass/20'
                     }`}
                   />
                 </div>
@@ -386,11 +387,11 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
               {/* Number of Attendees (Only when attending) */}
               {isAttending && (
                 <div>
-                  <label className="block text-xs uppercase tracking-wider text-stone-700 font-semibold mb-2">
-                    Total Number of Attendees <span className="text-stone-400 font-normal">(Optional)</span>
+                  <label className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2">
+                    Total Number of Attendees <span className="text-ink/50 font-normal">(Optional)</span>
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-brass-deep">
                       <Users className="w-4 h-4" />
                     </div>
                     <input
@@ -405,7 +406,7 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                           setErrors({ ...errors, attendees_count: null });
                         }
                       }}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-gold-200 bg-white focus:outline-none focus:border-gold-rich focus:ring-2 focus:ring-gold-100 transition-all text-sm font-semibold"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-brass/40 bg-paper-parchment focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-all text-sm font-semibold text-ink"
                     />
                   </div>
                   {errors.attendees_count && (
@@ -421,15 +422,15 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
             {/* Additional Guest Names */}
             {isAttending && (
               <div>
-                <label className="block text-xs uppercase tracking-wider text-stone-700 font-semibold mb-2">
-                  Names of Additional Guests in Your Party <span className="text-stone-400 font-normal">(Optional)</span>
+                <label className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2">
+                  Names of Additional Guests in Your Party <span className="text-ink/50 font-normal">(Optional)</span>
                 </label>
                 <input
                   type="text"
                   placeholder="e.g. Priya Kumar, Arjun Kumar"
                   value={formData.additional_guests}
                   onChange={(e) => setFormData({ ...formData, additional_guests: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-gold-200 bg-white focus:outline-none focus:border-gold-rich focus:ring-2 focus:ring-gold-100 transition-all text-sm"
+                  className="w-full px-4 py-3 rounded-xl border border-brass/40 bg-paper-parchment focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-all text-sm text-ink"
                 />
               </div>
             )}
@@ -437,19 +438,34 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
 
           {/* Section 3: Event Selection Checkboxes (Only when attending) */}
           {isAttending && (
-            <div className="space-y-6 pt-6 border-t border-gold-200/70 mb-10">
+            <div className="space-y-6 pt-6 border-t border-brass/25 mb-10">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                 <div>
-                  <h3 className="font-serif text-2xl font-bold text-maroon-royal">
+                  <h3 className="font-serif text-2xl font-bold text-maroon-deep">
                     Select Celebrations to Attend
                   </h3>
-                  <p className="text-xs text-stone-500 font-light mt-0.5">
+                  <p className="text-xs text-ink/65 font-light mt-0.5">
                     Select any combination of events you will be joining.
                   </p>
                 </div>
-                <span className="text-xs text-gold-deep font-semibold uppercase tracking-wider">
-                  {formData.selected_events.length} of {events.length} Selected
-                </span>
+                <div className="flex items-center space-x-3 mt-1 sm:mt-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (formData.selected_events.length === events.length) {
+                        setFormData((prev) => ({ ...prev, selected_events: [] }));
+                      } else {
+                        setFormData((prev) => ({ ...prev, selected_events: events.map((e) => e.id) }));
+                      }
+                    }}
+                    className="text-xs uppercase tracking-wider font-semibold text-maroon-temple hover:text-brass-deep transition-colors underline cursor-pointer"
+                  >
+                    {formData.selected_events.length === events.length ? 'Clear All' : 'Select All 5 Events'}
+                  </button>
+                  <span className="text-xs text-maroon-temple font-semibold uppercase tracking-wider">
+                    ({formData.selected_events.length} of {events.length} Selected)
+                  </span>
+                </div>
               </div>
 
               {errors.selected_events && (
@@ -459,7 +475,7 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                 </div>
               )}
 
-              {/* 5 Event Checkbox Cards */}
+              {/* Event Checkbox Cards */}
               <div className="space-y-3">
                 {events.map((event) => {
                   const isChecked = formData.selected_events.includes(event.id);
@@ -470,16 +486,16 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                       onClick={() => toggleEvent(event.id)}
                       className={`cursor-pointer rounded-2xl p-4 sm:p-5 border-2 transition-all duration-200 flex items-start space-x-4 ${
                         isChecked
-                          ? 'border-gold-rich bg-gold-50/50 shadow-sm'
-                          : 'border-stone-200 hover:border-gold-300 bg-white'
+                          ? 'border-brass bg-paper-warm shadow-xs ring-1 ring-brass/30'
+                          : 'border-brass/30 hover:border-brass bg-paper-parchment/60'
                       }`}
                     >
                       {/* Checkbox box */}
                       <div
                         className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-1 border transition-colors ${
                           isChecked
-                            ? 'bg-maroon-royal border-maroon-royal text-gold-champagne'
-                            : 'border-stone-300 bg-stone-50'
+                            ? 'bg-maroon-deep border-maroon-deep text-brass-glow'
+                            : 'border-brass/40 bg-paper'
                         }`}
                       >
                         {isChecked && <Check className="w-4 h-4 stroke-[3]" />}
@@ -487,25 +503,25 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
 
                       <div className="flex-1">
                         <div className="flex flex-wrap items-center gap-2 mb-1">
-                          <h4 className="font-serif text-lg sm:text-xl font-bold text-maroon-royal">
+                          <h4 className="font-serif text-lg sm:text-xl font-bold text-maroon-deep">
                             {event.title}
                           </h4>
                           {event.isMainEvent && (
-                            <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-maroon-100 text-maroon-800 border border-maroon-200">
+                            <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-maroon-temple/15 text-maroon-deep border border-maroon-temple/30">
                               Main Ceremony
                             </span>
                           )}
                         </div>
 
-                        <div className="text-xs text-stone-600 space-y-0.5 sm:space-y-0 sm:flex sm:items-center sm:space-x-3">
-                          <span className="font-medium text-stone-900">{event.dateLabel}</span>
-                          <span className="hidden sm:inline text-gold-deep">•</span>
+                        <div className="text-xs text-ink/75 space-y-0.5 sm:space-y-0 sm:flex sm:items-center sm:space-x-3">
+                          <span className="font-semibold text-ink">{event.dateLabel}</span>
+                          <span className="hidden sm:inline text-brass">•</span>
                           <span>{event.time}</span>
-                          <span className="hidden sm:inline text-gold-deep">•</span>
-                          <span className="text-stone-500">{event.venue}</span>
+                          <span className="hidden sm:inline text-brass">•</span>
+                          <span className="text-ink/65">{event.venue}</span>
                         </div>
                         {event.scheduleNote && (
-                          <div className="text-[11px] text-maroon-800 font-medium mt-1">
+                          <div className="text-[11px] text-maroon-temple font-medium mt-1">
                             {event.scheduleNote}
                           </div>
                         )}
@@ -518,19 +534,19 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
           )}
 
           {/* Section 4: Dietary & Special Requests */}
-          <div className="space-y-6 pt-6 border-t border-gold-200/70 mb-10">
-            <h3 className="font-serif text-2xl font-bold text-maroon-royal">
+          <div className="space-y-6 pt-6 border-t border-brass/25 mb-10">
+            <h3 className="font-serif text-2xl font-bold text-maroon-deep">
               Preferences &amp; Message
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Dietary Requirements */}
               <div>
-                <label className="block text-xs uppercase tracking-wider text-stone-700 font-semibold mb-2">
-                  Dietary Requirements <span className="text-stone-400 font-normal">(Optional)</span>
+                <label className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2">
+                  Dietary Requirements <span className="text-ink/50 font-normal">(Optional)</span>
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-brass-deep">
                     <Utensils className="w-4 h-4" />
                   </div>
                   <input
@@ -538,18 +554,18 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                     placeholder="e.g. Vegetarian, Vegan, Nut allergy, Jain food"
                     value={formData.dietary_requirements}
                     onChange={(e) => setFormData({ ...formData, dietary_requirements: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gold-200 bg-white focus:outline-none focus:border-gold-rich focus:ring-2 focus:ring-gold-100 transition-all text-sm"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-brass/40 bg-paper-parchment focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-all text-sm text-ink"
                   />
                 </div>
               </div>
 
               {/* Special Requests or Message for Couple */}
               <div>
-                <label className="block text-xs uppercase tracking-wider text-stone-700 font-semibold mb-2">
-                  Warm Wishes / Message for the Couple <span className="text-stone-400 font-normal">(Optional)</span>
+                <label className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2">
+                  Warm Wishes / Message for the Couple <span className="text-ink/50 font-normal">(Optional)</span>
                 </label>
                 <div className="relative">
-                  <div className="absolute top-3 left-3.5 pointer-events-none text-stone-400">
+                  <div className="absolute top-3 left-3.5 pointer-events-none text-brass-deep">
                     <MessageSquare className="w-4 h-4" />
                   </div>
                   <textarea
@@ -557,7 +573,7 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                     placeholder="Share your love, blessings, or special song request!"
                     value={formData.special_requests}
                     onChange={(e) => setFormData({ ...formData, special_requests: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gold-200 bg-white focus:outline-none focus:border-gold-rich focus:ring-2 focus:ring-gold-100 transition-all text-sm resize-none"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-brass/40 bg-paper-parchment focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-all text-sm text-ink resize-none"
                   />
                 </div>
               </div>
@@ -569,26 +585,26 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full sm:w-auto min-w-[280px] px-10 py-4 rounded-full text-sm font-bold uppercase tracking-widest transition-all duration-300 shadow-luxury ${
+              className={`w-full sm:w-auto min-w-[280px] px-10 py-4 rounded-full text-sm font-bold uppercase tracking-widest transition-all duration-300 shadow-temple cursor-pointer ${
                 isSubmitting
                   ? 'bg-stone-300 text-stone-500 cursor-not-allowed'
-                  : 'bg-maroon-royal hover:bg-maroon-800 text-ivory-50 hover:shadow-luxury-hover border border-gold-rich/50 transform hover:-translate-y-0.5'
+                  : 'bg-maroon-temple hover:bg-maroon-deep text-paper hover:shadow-luxury-hover border border-brass/50 transform hover:-translate-y-0.5'
               }`}
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center space-x-2">
-                  <Loader2 className="w-4 h-4 animate-spin text-gold-champagne" />
+                  <Loader2 className="w-4 h-4 animate-spin text-brass-glow" />
                   <span>Submitting RSVP...</span>
                 </span>
               ) : (
                 <span className="flex items-center justify-center space-x-2">
-                  <Sparkles className="w-4 h-4 text-gold-champagne" />
+                  <Sparkles className="w-4 h-4 text-brass-glow" />
                   <span>CONFIRM MY RSVP</span>
-                  <Sparkles className="w-4 h-4 text-gold-champagne" />
+                  <Sparkles className="w-4 h-4 text-brass-glow" />
                 </span>
               )}
             </button>
-            <p className="text-[11px] text-stone-500 mt-3 italic">
+            <p className="text-[11px] text-ink/65 mt-3 italic">
               Your response will be recorded securely and confirmed via email.
             </p>
           </div>

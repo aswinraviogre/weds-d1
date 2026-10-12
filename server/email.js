@@ -1,8 +1,8 @@
 import { Resend } from 'resend';
 
 const resendApiKey = process.env.RESEND_API_KEY;
-const senderEmail = process.env.SENDER_EMAIL || 'onboarding@resend.dev';
 const notificationEmail = process.env.NOTIFICATION_EMAIL || 'aswinravi70@gmail.com';
+const senderEmail = process.env.SENDER_EMAIL || 'onboarding@resend.dev';
 
 let resendClient = null;
 if (resendApiKey) {
@@ -10,20 +10,22 @@ if (resendApiKey) {
     resendClient = new Resend(resendApiKey);
     console.log('[Email] Resend client initialized successfully.');
   } catch (err) {
-    console.warn('[Email] Failed to initialize Resend:', err.message);
+    console.warn('[Email] Warning initializing Resend client:', err.message);
   }
 } else {
   console.log('[Email] RESEND_API_KEY not set. Operating in local preview logging mode.');
 }
 
 const eventDisplayNames = {
-  mehendi_sangeeth: 'Mehendi & Sangeeth — Nov 19, 2026 (5:30 PM onwards) at Sahvana Ranch',
   mehendi: 'Mehendi — Nov 19, 2026 (5:30 PM–8:00 PM) at Sahvana Ranch',
   sangeeth: 'Sangeeth — Nov 19, 2026 (8:00 PM onwards) at Sahvana Ranch',
-  haldi_pelli: 'Haldi and Pelli Kuturu & Pelli Koduku — Nov 20, 2026 (10:30 AM onwards) at Sahvana Ranch',
-  haldi: 'Haldi and Pelli Kuturu & Pelli Koduku — Nov 20, 2026 (10:30 AM) at Sahvana Ranch',
-  pelli_ceremony: 'Haldi and Pelli Kuturu & Pelli Koduku — Nov 20, 2026 (2:00 PM) at Sahvana Ranch',
-  wedding_ceremony: 'Wedding Ceremony — Nov 21, 2026 (11:05 AM) at Lotus Spring Ranch',
+  haldi: 'Haldi — Nov 20, 2026 (10:30 AM) at Sahvana Ranch',
+  pelli_rituals: 'Pelli Koduku & Pelli Kuturu — Nov 20, 2026 (2:00 PM onwards) at Sahvana Ranch',
+  wedding: 'Wedding Ceremony — Nov 21, 2026 (11:05 AM Muhurtham) at Lotus Spring Ranch',
+  // Backward compatibility
+  mehendi_sangeeth: 'Mehendi & Sangeeth — Nov 19, 2026 at Sahvana Ranch',
+  haldi_pelli: 'Haldi and Pelli Kuturu & Pelli Koduku — Nov 20, 2026 at Sahvana Ranch',
+  wedding_ceremony: 'Wedding Ceremony — Nov 21, 2026 at Lotus Spring Ranch',
 };
 
 /**
@@ -47,7 +49,7 @@ function createAdminEmailHtml(rsvp) {
   <html>
   <head>
     <meta charset="utf-8">
-    <title>New Wedding RSVP — Yaswanth Sai & Lakshmi Mrudula</title>
+    <title>New Wedding RSVP — Yaswanth & Mrudula</title>
   </head>
   <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #fcfbf7; margin: 0; padding: 30px 10px; color: #292524;">
     <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border: 1px solid #e7dfcf; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
@@ -55,7 +57,7 @@ function createAdminEmailHtml(rsvp) {
       <tr>
         <td align="center" style="background-color: #5a1827; padding: 35px 20px; border-bottom: 3px solid #d4af37;">
           <p style="color: #e5c992; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin: 0 0 8px 0;">Wedding Invitation RSVP</p>
-          <h1 style="color: #ffffff; font-size: 26px; margin: 0; font-weight: 600; letter-spacing: 1px;">Yaswanth Sai & Lakshmi Mrudula</h1>
+          <h1 style="color: #ffffff; font-size: 26px; margin: 0; font-weight: 600; letter-spacing: 1px;">Yaswanth & Mrudula</h1>
           <p style="color: #f7f3eb; font-size: 13px; margin: 8px 0 0 0;">November 19–21, 2026 • Texas, USA</p>
         </td>
       </tr>
@@ -68,15 +70,14 @@ function createAdminEmailHtml(rsvp) {
           </div>
 
           <h2 style="font-size: 18px; color: #5a1827; border-bottom: 1px solid #f0e6d6; padding-bottom: 10px; margin-top: 0;">Guest Details</h2>
-          
           <table width="100%" cellpadding="6" cellspacing="0" style="font-size: 14px; margin-bottom: 20px;">
             <tr>
-              <td width="35%" style="color: #78716c;">Guest Name:</td>
+              <td width="35%" style="color: #78716c;">Full Name:</td>
               <td style="color: #1c1917; font-weight: 600;">${rsvp.guest_name}</td>
             </tr>
             <tr>
               <td style="color: #78716c;">Email Address:</td>
-              <td style="color: #1c1917;">${rsvp.guest_email ? `<a href="mailto:${rsvp.guest_email}" style="color: #a67d1e; text-decoration: none;">${rsvp.guest_email}</a>` : '<em>Not provided</em>'}</td>
+              <td style="color: #1c1917;">${rsvp.guest_email || '<em>Not provided</em>'}</td>
             </tr>
             <tr>
               <td style="color: #78716c;">Phone Number:</td>
@@ -138,7 +139,7 @@ function createAdminEmailHtml(rsvp) {
       <!-- Footer -->
       <tr>
         <td align="center" style="background-color: #faf7ee; padding: 20px; font-size: 12px; color: #78716c; border-top: 1px solid #e7dfcf;">
-          Yaswanth Sai & Lakshmi Mrudula Wedding Celebration Portal • Texas, USA
+          Yaswanth & Mrudula Wedding Celebration Portal • Texas, USA
         </td>
       </tr>
     </table>
@@ -158,13 +159,13 @@ function createGuestConfirmationHtml(rsvp) {
   <html>
   <head>
     <meta charset="utf-8">
-    <title>RSVP Confirmation — Yaswanth Sai & Lakshmi Mrudula Wedding</title>
+    <title>RSVP Confirmation — Yaswanth & Mrudula Wedding</title>
   </head>
   <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #fcfbf7; margin: 0; padding: 30px 10px; color: #292524;">
     <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border: 1px solid #e7dfcf; border-radius: 12px; overflow: hidden;">
       <tr>
         <td align="center" style="background-color: #5a1827; padding: 35px 20px; border-bottom: 3px solid #d4af37;">
-          <h1 style="color: #ffffff; font-size: 26px; margin: 0; font-weight: 600;">Yaswanth Sai & Lakshmi Mrudula</h1>
+          <h1 style="color: #ffffff; font-size: 26px; margin: 0; font-weight: 600;">Yaswanth & Mrudula</h1>
           <p style="color: #e5c992; font-size: 14px; margin: 8px 0 0 0;">November 19–21, 2026 • Texas, USA</p>
         </td>
       </tr>
@@ -186,7 +187,7 @@ function createGuestConfirmationHtml(rsvp) {
           </div>
           <p style="font-size: 16px; color: #5a1827; font-style: italic; margin-top: 30px;">
             With love,<br/>
-            <strong>Yaswanth Sai & Lakshmi Mrudula</strong>
+            <strong>Yaswanth & Mrudula</strong>
           </p>
         </td>
       </tr>
@@ -203,7 +204,7 @@ export const emailService = {
   async sendRsvpNotifications(rsvp) {
     const isAttending = rsvp.attendance_status === 'attending';
     const statusText = isAttending ? 'ATTENDING' : 'DECLINED';
-    const subject = `New Wedding RSVP [${statusText}] — Yaswanth Sai & Lakshmi Mrudula`;
+    const subject = `New Wedding RSVP [${statusText}] — Yaswanth & Mrudula`;
 
     // 1. Dispatch notification to couple (aswinravi70@gmail.com)
     if (resendClient) {
@@ -227,7 +228,7 @@ export const emailService = {
             await resendClient.emails.send({
               from: `Yaswanth & Mrudula <${senderEmail}>`,
               to: [rsvp.guest_email],
-              subject: `Wedding RSVP Confirmation — Yaswanth Sai & Lakshmi Mrudula`,
+              subject: `Wedding RSVP Confirmation — Yaswanth & Mrudula`,
               html: createGuestConfirmationHtml(rsvp),
             });
             console.log('[Email] Sent confirmation email to guest:', rsvp.guest_email);
@@ -238,23 +239,18 @@ export const emailService = {
 
         return { sent: true };
       } catch (err) {
-        console.error('[Email] Exception while sending email with Resend:', err.message);
+        console.error('[Email] Unexpected error sending RSVP notification:', err);
         return { sent: false, error: err.message };
       }
     } else {
-      // Safe preview mode when RESEND_API_KEY is not set
-      console.log('================================================================');
-      console.log('📨 [EMAIL NOTIFICATION PREVIEW — SAVED TO LOG]');
-      console.log(`To: ${notificationEmail}`);
-      console.log(`Subject: ${subject}`);
-      console.log(`Guest: ${rsvp.guest_name} <${rsvp.guest_email}>`);
-      console.log(`Status: ${rsvp.attendance_status} (${rsvp.attendees_count} guests)`);
-      console.log(`Events: ${(rsvp.selected_events || []).join(', ') || 'None'}`);
-      if (rsvp.dietary_requirements) console.log(`Dietary: ${rsvp.dietary_requirements}`);
-      if (rsvp.special_requests) console.log(`Notes: ${rsvp.special_requests}`);
-      console.log('================================================================');
-
-      return { sent: false, mode: 'local_preview' };
+      console.log('----------------------------------------------------');
+      console.log(`[Email Preview] ${subject}`);
+      console.log(`Recipient: ${notificationEmail}`);
+      console.log(`Guest: ${rsvp.guest_name} (${rsvp.attendance_status})`);
+      console.log(`Attendees: ${rsvp.attendees_count}`);
+      console.log(`Events: ${JSON.stringify(rsvp.selected_events)}`);
+      console.log('----------------------------------------------------');
+      return { sent: false, preview: true };
     }
   },
 };

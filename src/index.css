@@ -4,21 +4,24 @@
 
 @layer base {
   :root {
-    --color-ivory: #FDFCF7;
-    --color-gold: #D4AF37;
-    --color-gold-light: #F4E8C9;
-    --color-maroon: #5A1827;
-    --color-sage: #718B6E;
+    --maroon-deep: #2A0B0E;
+    --maroon-temple: #7B1F2B;
+    --brass: #C9922F;
+    --brass-soft: #E8BD6D;
+    --paper: #FFF6D8;
+    --leaf: #1F6B4A;
+    --ink: #421217;
   }
 
   html {
     scroll-behavior: smooth;
+    background-color: #2A0B0E;
   }
 
   body {
-    background-color: #FAF8F5;
-    color: #292524;
-    font-family: 'Outfit', sans-serif;
+    background-color: #2A0B0E;
+    color: #FFF6D8;
+    font-family: 'Karla', 'Outfit', sans-serif;
   }
 
   h1, h2, h3, h4, .font-serif-luxury {
@@ -26,133 +29,148 @@
   }
 }
 
-/* Luxury gold shimmer text */
+/* Ambient temple lighting background layer - subtle translucent blend to let wedding-bg shine through */
+.bg-ambient-temple {
+  background: 
+    radial-gradient(circle at 50% 15%, rgba(201, 146, 47, 0.12) 0%, transparent 65%),
+    radial-gradient(circle at 10% 40%, rgba(123, 31, 43, 0.18) 0%, transparent 55%),
+    radial-gradient(circle at 90% 70%, rgba(201, 146, 47, 0.1) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(26, 5, 7, 0.45) 0%, rgba(42, 11, 14, 0.22) 30%, rgba(42, 11, 14, 0.26) 70%, rgba(20, 4, 7, 0.55) 100%);
+  backdrop-filter: blur(0.5px);
+}
+
+/* Authentic Paper-Cut / Sandalwood Parchment Card Styling */
+.paper-cut-card {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 253, 248, 0.98) 0%, rgba(255, 247, 232, 0.96) 100%);
+  color: #421217;
+  border-radius: 1.5rem;
+  box-shadow: 
+    0 22px 55px -12px rgba(15, 3, 5, 0.85),
+    0 0 0 1px rgba(201, 146, 47, 0.4),
+    0 0 35px rgba(201, 146, 47, 0.18);
+  backdrop-filter: blur(10px);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.paper-cut-card::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(201, 146, 47, 0.38);
+  border-radius: 1.25rem;
+  pointer-events: none;
+}
+
+.paper-cut-card:hover {
+  box-shadow: 
+    0 30px 65px -12px rgba(15, 3, 5, 0.95),
+    0 0 0 1.5px rgba(201, 146, 47, 0.65),
+    0 0 45px rgba(201, 146, 47, 0.28);
+  transform: translateY(-2px);
+}
+
+/* Traditional temple gold shimmer text */
 .text-gold-gradient {
-  background: linear-gradient(135deg, #B38728 0%, #D4AF37 40%, #F5DEB3 60%, #AA771C 100%);
+  background: linear-gradient(135deg, #FFE8A3 0%, #C9922F 45%, #E8BD6D 70%, #7D5117 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Ornamental border & separator */
-.ornament-divider {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  color: #C5A059;
+.text-brass-gradient {
+  background: linear-gradient(135deg, #FFCF5C 0%, #C9922F 50%, #996515 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.ornament-divider::before,
-.ornament-divider::after {
-  content: '';
-  flex: 1;
-  border-bottom: 1px solid #E6D7B8;
+/* Toran Garland & Diya Lighting Accents */
+.toran-accent-line {
+  background: linear-gradient(90deg, transparent 0%, #C9922F 50%, transparent 100%);
+  height: 1px;
+  width: 100%;
 }
 
-.ornament-divider:not(:empty)::before {
-  margin-right: 1.25em;
+.diya-glow {
+  filter: drop-shadow(0 0 12px rgba(255, 207, 92, 0.65));
 }
 
-.ornament-divider:not(:empty)::after {
-  margin-left: 1.25em;
-}
-
-/* Card luxury border */
-.luxury-border-card {
-  position: relative;
-  border: 1px solid #EEDFC3;
-  background: #FFFDF9;
-  box-shadow: 0 10px 30px -5px rgba(90, 24, 39, 0.04), 0 4px 10px -2px rgba(212, 175, 55, 0.06);
-  transition: all 0.3s ease;
-}
-
-.luxury-border-card:hover {
-  border-color: #D4AF37;
-  box-shadow: 0 20px 40px -10px rgba(90, 24, 39, 0.08), 0 0 25px rgba(212, 175, 55, 0.12);
-}
-
-/* Subtle corner flourish */
+/* Ornamental corner flourish */
 .corner-ornament {
   position: absolute;
-  width: 24px;
-  height: 24px;
-  border-color: #D4AF37;
+  width: 20px;
+  height: 20px;
+  border-color: #C9922F;
   pointer-events: none;
 }
-.corner-tl { top: 8px; left: 8px; border-top: 2px solid; border-left: 2px solid; }
-.corner-tr { top: 8px; right: 8px; border-top: 2px solid; border-right: 2px solid; }
-.corner-bl { bottom: 8px; left: 8px; border-bottom: 2px solid; border-left: 2px solid; }
-.corner-br { bottom: 8px; right: 8px; border-bottom: 2px solid; border-right: 2px solid; }
+.corner-tl { top: 10px; left: 10px; border-top: 1.5px solid; border-left: 1.5px solid; }
+.corner-tr { top: 10px; right: 10px; border-top: 1.5px solid; border-right: 1.5px solid; }
+.corner-bl { bottom: 10px; left: 10px; border-bottom: 1.5px solid; border-left: 1.5px solid; }
+.corner-br { bottom: 10px; right: 10px; border-bottom: 1.5px solid; border-right: 1.5px solid; }
 
-/* Custom scrollbar */
+/* Custom scrollbar matching temple brass */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #FAF8F5;
+  background: #190507;
 }
 ::-webkit-scrollbar-thumb {
-  background: #DFD1B0;
+  background: #7D5117;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #C59B27;
+  background: #C9922F;
 }
 
-/* Subtle pulsing glow for main ceremony */
-@keyframes goldPulse {
+/* Temple Gopuram Door 3D Perspective */
+.perspective-temple {
+  perspective: 1200px;
+}
+
+.temple-door-left {
+  transform-origin: left center;
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.temple-door-right {
+  transform-origin: right center;
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.doors-parted .temple-door-left {
+  transform: rotateY(-88deg) translateX(-15%);
+  opacity: 0.2;
+}
+
+.doors-parted .temple-door-right {
+  transform: rotateY(88deg) translateX(15%);
+  opacity: 0.2;
+}
+
+/* Floating Card Animation */
+@keyframes floatGentle {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2), 0 10px 30px -5px rgba(90, 24, 39, 0.08);
+    transform: translateY(0px);
   }
   50% {
-    box-shadow: 0 0 25px rgba(212, 175, 55, 0.4), 0 15px 35px -5px rgba(90, 24, 39, 0.12);
+    transform: translateY(-8px);
   }
 }
 
-.ceremony-glow {
-  animation: goldPulse 4s infinite ease-in-out;
+.animate-float-gentle {
+  animation: floatGentle 4.5s ease-in-out infinite;
 }
 
-/* 3D Royal Indian Wedding Envelope Styles */
-.perspective-envelope {
-  perspective: 1400px;
+/* High-contrast royal gold text for headings over rich textured backgrounds */
+.text-royal-gold {
+  color: #FFF2D1;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9), 0 0 20px rgba(201, 146, 47, 0.4);
 }
 
-.envelope-wrapper {
-  transform-style: preserve-3d;
-}
-
-.envelope-flap-3d {
-  transform-origin: top center;
-  transform-style: preserve-3d;
-  transition: transform 0.85s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.envelope-flap-3d.flap-open {
-  transform: rotateX(180deg);
-  z-index: 5 !important;
-}
-
-.envelope-stage-container {
-  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.invitation-inner-card {
-  transition: transform 0.95s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease, box-shadow 0.95s ease;
-}
-
-@keyframes sealPulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.6), 0 8px 25px rgba(0, 0, 0, 0.4);
-  }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 14px rgba(212, 175, 55, 0), 0 14px 35px rgba(0, 0, 0, 0.5);
-  }
-}
-
-.seal-pulse-animation {
-  border-radius: 9999px;
-  animation: sealPulse 2.4s infinite ease-in-out;
+.text-royal-title {
+  background: linear-gradient(135deg, #FFFDF0 0%, #FFDF88 40%, #D4A034 85%, #9E6B15 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 24px rgba(201, 146, 47, 0.45));
 }
 

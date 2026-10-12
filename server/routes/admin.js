@@ -62,19 +62,20 @@ adminRouter.get('/rsvps', requireAdminAuth, async (req, res) => {
     if (event && event !== 'all') {
       rsvps = rsvps.filter((r) => {
         if (!Array.isArray(r.selected_events)) return false;
-        if (event === 'haldi_pelli') {
-          return (
-            r.selected_events.includes('haldi_pelli') ||
-            r.selected_events.includes('haldi') ||
-            r.selected_events.includes('pelli_ceremony')
-          );
+        if (event === 'wedding' || event === 'wedding_ceremony') {
+          return r.selected_events.includes('wedding') || r.selected_events.includes('wedding_ceremony');
         }
-        if (event === 'mehendi_sangeeth') {
-          return (
-            r.selected_events.includes('mehendi_sangeeth') ||
-            r.selected_events.includes('mehendi') ||
-            r.selected_events.includes('sangeeth')
-          );
+        if (event === 'mehendi') {
+          return r.selected_events.includes('mehendi') || r.selected_events.includes('mehendi_sangeeth');
+        }
+        if (event === 'sangeeth') {
+          return r.selected_events.includes('sangeeth') || r.selected_events.includes('mehendi_sangeeth');
+        }
+        if (event === 'haldi') {
+          return r.selected_events.includes('haldi') || r.selected_events.includes('haldi_pelli');
+        }
+        if (event === 'pelli_rituals' || event === 'pelli_ceremony') {
+          return r.selected_events.includes('pelli_rituals') || r.selected_events.includes('pelli_ceremony') || r.selected_events.includes('haldi_pelli');
         }
         return r.selected_events.includes(event);
       });

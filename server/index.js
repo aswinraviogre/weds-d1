@@ -24,7 +24,7 @@ app.use('/api/admin', adminRouter);
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    app: 'Yaswanth Sai & Lakshmi Mrudula Wedding Portal',
+    app: 'Yaswanth & Mrudula Wedding Portal',
     timestamp: new Date().toISOString(),
   });
 });
@@ -50,7 +50,7 @@ app.get('*', (req, res, next) => {
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`================================================================`);
-    console.log(`✨ Yaswanth Sai & Lakshmi Mrudula Wedding Backend running`);
+    console.log(`✨ Yaswanth & Mrudula Wedding Backend running`);
     console.log(`📡 API listening at: http://localhost:${PORT}`);
     console.log(`🔐 Admin Dashboard Passcode configured`);
     console.log(`================================================================`);

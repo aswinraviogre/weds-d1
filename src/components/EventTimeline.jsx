@@ -27,27 +27,28 @@ export function EventTimeline({ onSelectEventRsvp }) {
   };
 
   return (
-    <section id="celebrations" className="py-24 px-4 sm:px-6 lg:px-8 bg-ivory-50 relative">
+    <section id="celebrations" className="py-24 px-4 sm:px-6 lg:px-8 bg-ambient-temple relative">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
-          <div className="inline-flex items-center space-x-2 px-4 py-1 rounded-full bg-gold-100/60 border border-gold-300/60 text-gold-deep text-xs font-semibold uppercase tracking-[0.2em] mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-gold-rich" />
-            <span>Three Days of Joy &amp; Traditions</span>
+          <div className="inline-flex items-center space-x-2 px-5 py-1.5 rounded-full bg-maroon-night/90 border border-brass/55 text-brass-soft text-xs font-semibold uppercase tracking-[0.25em] mb-4 shadow-sm backdrop-blur-md">
+            <Sparkles className="w-3.5 h-3.5 text-brass" />
+            <span>Five Auspicious Celebrations</span>
+            <Sparkles className="w-3.5 h-3.5 text-brass" />
           </div>
-          <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-maroon-royal mb-4 tracking-tight">
-            Our Wedding Celebrations
+          <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-b from-[#FFFDF0] via-[#FFD77D] to-[#D49E35] filter drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]">
+            Wedding Celebrations
           </h2>
-          <div className="w-24 h-0.5 bg-gold-rich mx-auto mb-6" />
-          <p className="text-stone-600 text-base sm:text-lg font-light leading-relaxed">
+          <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-brass to-transparent mx-auto mb-6" />
+          <p className="text-paper/95 text-base sm:text-lg font-light leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
             We are honored to celebrate each sacred rite and joyous celebration with our cherished family and friends.
             Please join us for these auspicious moments in Texas.
           </p>
         </div>
 
-        {/* 5 Event Cards */}
+        {/* 5 Celebration Event Cards with Themed Illustrations */}
         <div className="space-y-12 sm:space-y-16">
-          {events.map((event, index) => {
+          {events.map((event) => {
             const isMainEvent = event.isMainEvent;
             const isCalendarOpen = activeCalendarMenu === event.id;
 
@@ -55,122 +56,137 @@ export function EventTimeline({ onSelectEventRsvp }) {
               <div
                 key={event.id}
                 id={`event-${event.id}`}
-                className={`relative rounded-3xl overflow-hidden transition-all duration-300 ${
-                  isMainEvent
-                    ? 'border-2 border-gold-rich bg-cream-light shadow-luxury ceremony-glow'
-                    : 'luxury-border-card'
+                className={`relative rounded-3xl overflow-hidden transition-all duration-500 border border-brass/30 bg-gradient-to-br from-[#1C0508]/80 via-[#26080D]/75 to-[#160305]/85 backdrop-blur-md shadow-[0_0_50px_15px_rgba(18,3,6,0.6),0_20px_50px_rgba(10,2,4,0.75)] hover:shadow-[0_0_60px_20px_rgba(201,146,47,0.2),0_25px_60px_rgba(10,2,4,0.9)] hover:border-brass/50 ${
+                  isMainEvent ? 'ring-2 ring-brass/80 shadow-[0_0_60px_20px_rgba(201,146,47,0.25)]' : ''
                 }`}
               >
-                {/* Main event special ribbon */}
+                {/* Soft inner radial vignette feathering */}
+                <div className="absolute inset-0 bg-radial from-transparent via-[#180406]/15 to-[#100204]/45 pointer-events-none rounded-3xl" />
+
+                {/* Main event special header ribbon */}
                 {isMainEvent && (
-                  <div className="bg-maroon-royal text-gold-champagne py-2 px-6 text-center border-b border-gold-rich">
-                    <span className="text-xs sm:text-sm uppercase tracking-[0.25em] font-semibold flex items-center justify-center space-x-2">
-                      <Sparkles className="w-4 h-4 text-gold-rich inline" />
-                      <span>The Sacred Wedding Muhurtham — Main Event</span>
-                      <Sparkles className="w-4 h-4 text-gold-rich inline" />
+                  <div className="relative z-10 bg-gradient-to-r from-maroon-deep via-maroon-temple to-maroon-deep text-brass-glow py-2.5 px-6 text-center border-b border-brass/40 flex items-center justify-center space-x-2 shadow-sm">
+                    <Sparkles className="w-4 h-4 text-brass inline" />
+                    <span className="text-xs sm:text-sm uppercase tracking-[0.25em] font-serif font-bold text-[#FFD77D]">
+                      The Sacred Wedding Muhurtham — Main Event
                     </span>
+                    <Sparkles className="w-4 h-4 text-brass inline" />
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
-                  {/* Event Visual / Image */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 relative z-10">
+                  {/* Event Themed Artwork */}
                   <div className="lg:col-span-5 relative min-h-[260px] sm:min-h-[340px] overflow-hidden group">
                     <img
                       src={event.image}
                       alt={event.title}
                       loading="lazy"
-                      className="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 via-stone-900/10 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-maroon-deep/75 via-maroon-deep/20 to-transparent" />
+                    {/* Soft wide horizontal gradient bleed into content card on large screens */}
+                    <div className="hidden lg:block absolute inset-y-0 right-0 w-28 bg-gradient-to-r from-transparent via-[#1C0508]/65 to-[#1C0508] pointer-events-none z-10" />
+                    {/* Soft wide vertical gradient bleed into content card on mobile */}
+                    <div className="lg:hidden absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent via-[#1C0508]/65 to-[#1C0508] pointer-events-none z-10" />
 
                     {/* Event Sequence Badge */}
-                    <div className="absolute top-4 left-4 bg-cream-light/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-gold-rich/50 shadow-sm">
-                      <span className="font-serif text-sm font-bold text-maroon-royal">
+                    <div className="absolute top-4 left-4 bg-[#140305]/95 backdrop-blur-md px-4 py-1 rounded-full border border-brass/80 shadow-md z-20">
+                      <span className="font-serif text-xs font-bold text-[#FFD77D] tracking-wider uppercase">
                         Event {event.number}
                       </span>
                     </div>
 
-                    {/* Attire recommendation tag */}
+                    {/* Attire recommendation tag - fully visible on all events */}
                     {event.attire && (
-                      <div className="absolute bottom-4 left-4 right-4 bg-stone-900/80 backdrop-blur-sm p-2.5 rounded-xl border border-stone-700/60 text-left">
-                        <span className="text-[10px] uppercase tracking-wider text-gold-champagne font-semibold block">
+                      <div className="absolute bottom-4 left-4 right-4 bg-[#140305]/95 backdrop-blur-md p-3.5 rounded-xl border border-brass/70 shadow-[0_4px_16px_rgba(0,0,0,0.85)] text-left z-20">
+                        <span className="text-[10px] uppercase tracking-widest text-[#FFD77D] font-bold block mb-1">
                           Suggested Attire
                         </span>
-                        <span className="text-xs text-stone-200 line-clamp-1">
+                        <span className="text-xs text-[#FFFDF8] font-medium leading-relaxed block">
                           {event.attire}
                         </span>
                       </div>
                     )}
                   </div>
 
-                  {/* Event Details Content */}
-                  <div className="lg:col-span-7 p-6 sm:p-8 md:p-10 flex flex-col justify-between">
+                  {/* Event Details Content - Feathered into background with 100% visible text */}
+                  <div className="lg:col-span-7 p-6 sm:p-8 md:p-10 flex flex-col justify-between bg-transparent text-[#FFF6D8]">
                     <div>
                       {/* Event Badge & Title */}
                       <div className="flex flex-wrap items-center gap-2 mb-3">
-                        <span className={`text-[11px] font-semibold tracking-wider uppercase px-3 py-1 rounded-full border ${event.badgeColor}`}>
+                        <span className={`text-[11px] font-semibold tracking-wider uppercase px-3.5 py-1 rounded-full border shadow-xs ${
+                          event.themeAccent === 'emerald'
+                            ? 'bg-emerald-950/85 text-emerald-300 border-emerald-500/50'
+                            : event.themeAccent === 'indigo'
+                            ? 'bg-indigo-950/85 text-indigo-300 border-indigo-500/50'
+                            : event.themeAccent === 'amber'
+                            ? 'bg-amber-950/85 text-amber-300 border-amber-500/50'
+                            : event.themeAccent === 'orange'
+                            ? 'bg-orange-950/85 text-orange-300 border-orange-500/50'
+                            : 'bg-maroon-900/90 text-[#FFD77D] border-brass/60'
+                        }`}>
                           {event.badgeText}
                         </span>
                       </div>
 
-                      <h3 className="font-serif text-3xl sm:text-4xl font-bold text-maroon-royal mb-1">
+                      <h3 className="font-serif text-3xl sm:text-4xl font-bold mb-1 text-transparent bg-clip-text bg-gradient-to-b from-[#FFFDF0] via-[#FFD77D] to-[#D49E35] filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
                         {event.title}
                       </h3>
-                      <p className="font-serif italic text-gold-deep text-lg mb-4">
+                      <p className="font-serif italic text-[#FFCF5C] text-lg mb-4 drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
                         {event.subTitle}
                       </p>
 
-                      <p className="text-stone-600 text-sm sm:text-base leading-relaxed mb-6 font-light">
+                      <p className="text-[#FFF6D8]/90 text-sm sm:text-base leading-relaxed mb-6 font-light drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
                         {event.description}
                       </p>
 
                       {/* Date, Time & Venue Specs */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4 border-y border-gold-200/60 mb-6 bg-gold-50/30 rounded-xl px-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4 border border-brass/35 mb-6 bg-[#130305]/75 rounded-2xl p-4 shadow-inner backdrop-blur-sm">
                         <div className="flex items-start space-x-3">
-                          <div className="p-2 rounded-lg bg-gold-100 text-maroon-royal mt-0.5">
-                            <Calendar className="w-4 h-4 text-gold-deep" />
+                          <div className="p-2 rounded-xl bg-[#2A080C] border border-brass/60 text-[#FFD77D] mt-0.5 shadow-xs">
+                            <Calendar className="w-4 h-4 text-[#FFD77D]" />
                           </div>
                           <div>
-                            <span className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold block">
+                            <span className="text-[11px] uppercase tracking-wider text-[#E8BD6D] font-semibold block">
                               Date &amp; Day
                             </span>
-                            <span className="text-sm font-medium text-stone-900">
+                            <span className="text-sm font-bold text-[#FFFDF8]">
                               {event.dateLabel}
                             </span>
                           </div>
                         </div>
 
                         <div className="flex items-start space-x-3">
-                          <div className="p-2 rounded-lg bg-gold-100 text-maroon-royal mt-0.5">
-                            <Clock className="w-4 h-4 text-gold-deep" />
+                          <div className="p-2 rounded-xl bg-[#2A080C] border border-brass/60 text-[#FFD77D] mt-0.5 shadow-xs">
+                            <Clock className="w-4 h-4 text-[#FFD77D]" />
                           </div>
                           <div>
-                            <span className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold block">
+                            <span className="text-[11px] uppercase tracking-wider text-[#E8BD6D] font-semibold block">
                               Time (Central Time)
                             </span>
-                            <span className="text-sm font-medium text-stone-900 block">
+                            <span className="text-sm font-bold text-[#FFFDF8] block">
                               {event.time}
                             </span>
                             {event.scheduleNote && (
-                              <span className="text-[11px] text-maroon-800 font-medium block mt-0.5">
+                              <span className="text-[11px] text-[#FFCF5C] font-medium block mt-0.5">
                                 {event.scheduleNote}
                               </span>
                             )}
                           </div>
                         </div>
 
-                        <div className="sm:col-span-2 flex items-start space-x-3 pt-2">
-                          <div className="p-2 rounded-lg bg-gold-100 text-maroon-royal mt-0.5">
-                            <MapPin className="w-4 h-4 text-gold-deep" />
+                        <div className="sm:col-span-2 flex items-start space-x-3 pt-2 border-t border-brass/25">
+                          <div className="p-2 rounded-xl bg-[#2A080C] border border-brass/60 text-[#FFD77D] mt-0.5 shadow-xs">
+                            <MapPin className="w-4 h-4 text-[#FFD77D]" />
                           </div>
                           <div>
-                            <span className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold block">
+                            <span className="text-[11px] uppercase tracking-wider text-[#E8BD6D] font-semibold block">
                               Venue &amp; Location
                             </span>
-                            <span className="text-sm font-semibold text-stone-900 block">
+                            <span className="text-sm font-bold text-[#FFFDF8] block">
                               {event.venue}
                             </span>
-                            <span className="text-xs text-stone-600">
+                            <span className="text-xs text-[#FFF6D8]/80 block mt-0.5">
                               {event.address}
                             </span>
                           </div>
@@ -185,20 +201,20 @@ export function EventTimeline({ onSelectEventRsvp }) {
                         href={event.mapsUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full border border-stone-300 hover:border-gold-rich bg-white hover:bg-gold-50 text-stone-800 text-xs font-semibold tracking-wider uppercase transition-all shadow-xs"
+                        className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full border border-brass/60 hover:border-brass bg-[#160305]/90 hover:bg-brass/20 text-[#FFF6D8] text-xs font-semibold tracking-wider uppercase transition-all shadow-sm cursor-pointer"
                       >
-                        <MapPin className="w-3.5 h-3.5 text-maroon-royal" />
+                        <MapPin className="w-3.5 h-3.5 text-[#FFD77D]" />
                         <span>Get Directions</span>
-                        <ExternalLink className="w-3 h-3 text-stone-400" />
+                        <ExternalLink className="w-3 h-3 text-[#FFF6D8]/60" />
                       </a>
 
                       {/* 2. RSVP for This Event */}
                       <button
                         type="button"
                         onClick={() => handleRsvpClick(event.id)}
-                        className="inline-flex items-center space-x-1.5 px-5 py-2.5 rounded-full bg-maroon-royal hover:bg-maroon-800 text-ivory-50 text-xs font-semibold tracking-wider uppercase transition-all shadow-xs hover:shadow-md border border-gold-rich/30"
+                        className="inline-flex items-center space-x-1.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-maroon-temple via-[#912433] to-maroon-temple hover:from-maroon-royal hover:to-maroon-deep text-[#FFFDF8] text-xs font-bold tracking-wider uppercase transition-all shadow-md hover:shadow-luxury-hover border border-brass/70 cursor-pointer"
                       >
-                        <CheckCircle2 className="w-3.5 h-3.5 text-gold-champagne" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-brass-glow" />
                         <span>RSVP for This Event</span>
                       </button>
 
@@ -207,23 +223,23 @@ export function EventTimeline({ onSelectEventRsvp }) {
                         <button
                           type="button"
                           onClick={() => setActiveCalendarMenu(isCalendarOpen ? null : event.id)}
-                          className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full border border-gold-300 bg-gold-50/80 hover:bg-gold-100 text-stone-800 text-xs font-semibold tracking-wider uppercase transition-all shadow-xs"
+                          className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full border border-brass/60 bg-[#160305]/90 hover:bg-brass/20 text-[#FFF6D8] text-xs font-semibold tracking-wider uppercase transition-all shadow-sm cursor-pointer"
                           aria-expanded={isCalendarOpen}
                         >
-                          <CalendarPlus className="w-3.5 h-3.5 text-gold-deep" />
+                          <CalendarPlus className="w-3.5 h-3.5 text-[#FFD77D]" />
                           <span>Add to Calendar</span>
                         </button>
 
                         {isCalendarOpen && (
-                          <div className="absolute right-0 bottom-full mb-2 w-52 rounded-xl bg-white shadow-xl border border-gold-200 py-1.5 z-20">
+                          <div className="absolute right-0 bottom-full mb-2 w-52 rounded-2xl bg-[#160305] text-[#FFF6D8] shadow-[0_15px_35px_rgba(0,0,0,0.85)] border border-brass/60 py-2 z-30">
                             <a
                               href={createGoogleCalendarUrl(event, couple.fullName)}
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={() => setActiveCalendarMenu(null)}
-                              className="flex items-center space-x-2 px-4 py-2.5 text-xs text-stone-700 hover:bg-gold-50 hover:text-maroon-royal transition-colors"
+                              className="flex items-center space-x-2 px-4 py-2.5 text-xs text-[#FFF6D8] hover:bg-brass/20 transition-colors"
                             >
-                              <ExternalLink className="w-3.5 h-3.5 text-gold-rich" />
+                              <ExternalLink className="w-3.5 h-3.5 text-[#FFD77D]" />
                               <span>Google Calendar</span>
                             </a>
                             <button
@@ -232,9 +248,9 @@ export function EventTimeline({ onSelectEventRsvp }) {
                                 downloadIcsFile(event, couple.fullName);
                                 setActiveCalendarMenu(null);
                               }}
-                              className="w-full text-left flex items-center space-x-2 px-4 py-2.5 text-xs text-stone-700 hover:bg-gold-50 hover:text-maroon-royal transition-colors border-t border-stone-100"
+                              className="w-full text-left flex items-center space-x-2 px-4 py-2.5 text-xs text-[#FFF6D8] hover:bg-brass/20 transition-colors border-t border-brass/20 cursor-pointer"
                             >
-                              <Download className="w-3.5 h-3.5 text-gold-rich" />
+                              <Download className="w-3.5 h-3.5 text-[#FFD77D]" />
                               <span>Apple / Outlook (.ics)</span>
                             </button>
                           </div>

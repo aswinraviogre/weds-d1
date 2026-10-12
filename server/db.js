@@ -198,9 +198,11 @@ export const db = {
     let totalExpectedAttendees = 0;
 
     const eventCounts = {
-      mehendi_sangeeth: 0,
-      haldi_pelli: 0,
-      wedding_ceremony: 0,
+      mehendi: 0,
+      sangeeth: 0,
+      haldi: 0,
+      pelli_rituals: 0,
+      wedding: 0,
     };
 
     for (const rsvp of rsvps) {
@@ -212,15 +214,23 @@ export const db = {
         if (Array.isArray(rsvp.selected_events)) {
           const accountedEvents = new Set();
           for (const evId of rsvp.selected_events) {
-            let normalizedId = evId;
-            if (evId === 'mehendi' || evId === 'sangeeth') {
-              normalizedId = 'mehendi_sangeeth';
-            } else if (evId === 'haldi' || evId === 'pelli_ceremony' || evId === 'haldi_pelli') {
-              normalizedId = 'haldi_pelli';
+            // Map legacy IDs if any exist
+            let mappedIds = [evId];
+            if (evId === 'mehendi_sangeeth') {
+              mappedIds = ['mehendi', 'sangeeth'];
+            } else if (evId === 'haldi_pelli') {
+              mappedIds = ['haldi', 'pelli_rituals'];
+            } else if (evId === 'wedding_ceremony') {
+              mappedIds = ['wedding'];
+            } else if (evId === 'pelli_ceremony') {
+              mappedIds = ['pelli_rituals'];
             }
-            if (eventCounts[normalizedId] !== undefined && !accountedEvents.has(normalizedId)) {
-              accountedEvents.add(normalizedId);
-              eventCounts[normalizedId] += count;
+
+            for (const targetId of mappedIds) {
+              if (eventCounts[targetId] !== undefined && !accountedEvents.has(targetId)) {
+                accountedEvents.add(targetId);
+                eventCounts[targetId] += count;
+              }
             }
           }
         }
