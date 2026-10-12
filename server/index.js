@@ -47,10 +47,14 @@ app.get('*', (req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`================================================================`);
-  console.log(`✨ Yaswanth Sai & Lakshmi Mrudula Wedding Backend running`);
-  console.log(`📡 API listening at: http://localhost:${PORT}`);
-  console.log(`🔐 Admin Dashboard Passcode configured`);
-  console.log(`================================================================`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`================================================================`);
+    console.log(`✨ Yaswanth Sai & Lakshmi Mrudula Wedding Backend running`);
+    console.log(`📡 API listening at: http://localhost:${PORT}`);
+    console.log(`🔐 Admin Dashboard Passcode configured`);
+    console.log(`================================================================`);
+  });
+}
+
+export default app;
