@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { EnvelopeOpening } from './components/EnvelopeOpening';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
+import { DivineBlessing } from './components/DivineBlessing';
 import { Welcome } from './components/Welcome';
 import { EventTimeline } from './components/EventTimeline';
 import { OurStory } from './components/OurStory';
@@ -67,10 +68,13 @@ export function App() {
         {/* 1. Hero Section with Prominent Couple Names & Live Countdown */}
         <Hero />
 
+        {/* Auspicious Divine Blessings in Golden Frame */}
+        <DivineBlessing />
+
         {/* 2. Welcome Message & Family Blessings */}
         <Welcome />
 
-        {/* 3. 5 Wedding Celebration Event Cards with Maps, ICS & RSVP Triggers */}
+        {/* 3. Three Wedding Celebration Event Cards with Maps, ICS & RSVP Triggers */}
         <EventTimeline onSelectEventRsvp={handlePreselectEvent} />
 
         {/* 4. Our Story Section */}

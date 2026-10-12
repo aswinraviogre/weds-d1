@@ -2,7 +2,7 @@ import { Resend } from 'resend';
 
 const resendApiKey = process.env.RESEND_API_KEY;
 const senderEmail = process.env.SENDER_EMAIL || 'onboarding@resend.dev';
-const notificationEmail = process.env.NOTIFICATION_EMAIL || 'yash.mrudula@gmail.com';
+const notificationEmail = process.env.NOTIFICATION_EMAIL || 'aswinravi70@gmail.com';
 
 let resendClient = null;
 if (resendApiKey) {
@@ -20,8 +20,9 @@ const eventDisplayNames = {
   mehendi_sangeeth: 'Mehendi & Sangeeth — Nov 19, 2026 (5:30 PM onwards) at Sahvana Ranch',
   mehendi: 'Mehendi — Nov 19, 2026 (5:30 PM–8:00 PM) at Sahvana Ranch',
   sangeeth: 'Sangeeth — Nov 19, 2026 (8:00 PM onwards) at Sahvana Ranch',
-  haldi: 'Haldi — Nov 20, 2026 (10:30 AM) at Sahvana Ranch',
-  pelli_ceremony: 'Pelli Kuturu & Pelli Koduku — Nov 20, 2026 (2:00 PM) at Sahvana Ranch',
+  haldi_pelli: 'Haldi and Pelli Kuturu & Pelli Koduku — Nov 20, 2026 (10:30 AM onwards) at Sahvana Ranch',
+  haldi: 'Haldi and Pelli Kuturu & Pelli Koduku — Nov 20, 2026 (10:30 AM) at Sahvana Ranch',
+  pelli_ceremony: 'Haldi and Pelli Kuturu & Pelli Koduku — Nov 20, 2026 (2:00 PM) at Sahvana Ranch',
   wedding_ceremony: 'Wedding Ceremony — Nov 21, 2026 (11:05 AM) at Lotus Spring Ranch',
 };
 
@@ -204,7 +205,7 @@ export const emailService = {
     const statusText = isAttending ? 'ATTENDING' : 'DECLINED';
     const subject = `New Wedding RSVP [${statusText}] — Yaswanth Sai & Lakshmi Mrudula`;
 
-    // 1. Dispatch notification to couple (yash.mrudula@gmail.com)
+    // 1. Dispatch notification to couple (aswinravi70@gmail.com)
     if (resendClient) {
       try {
         const { data, error } = await resendClient.emails.send({

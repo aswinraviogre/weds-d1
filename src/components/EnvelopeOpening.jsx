@@ -13,6 +13,9 @@ export function EnvelopeOpening({ isOpen, onComplete, onSkip }) {
 
   const triggerEnterSite = () => {
     if (isEnteringRef.current) return;
+    try {
+      window.dispatchEvent(new CustomEvent('start-wedding-audio'));
+    } catch (e) {}
     isEnteringRef.current = true;
     setAnimationStage('entering');
     setTimeout(() => {
@@ -21,6 +24,9 @@ export function EnvelopeOpening({ isOpen, onComplete, onSkip }) {
   };
 
   const handleOpenEnvelope = () => {
+    try {
+      window.dispatchEvent(new CustomEvent('start-wedding-audio'));
+    } catch (e) {}
     if (animationStage !== 'sealed') {
       // If already opening/revealed, a tap enters immediately
       triggerEnterSite();
@@ -74,7 +80,12 @@ export function EnvelopeOpening({ isOpen, onComplete, onSkip }) {
         </span>
 
         <button
-          onClick={onSkip}
+          onClick={() => {
+            try {
+              window.dispatchEvent(new CustomEvent('start-wedding-audio'));
+            } catch (e) {}
+            if (onSkip) onSkip();
+          }}
           className="inline-flex items-center space-x-1.5 px-4 py-1.5 rounded-full border border-gold-rich/40 bg-black/40 hover:bg-gold-rich/20 text-gold-champagne hover:text-white text-xs uppercase tracking-widest font-semibold transition-all backdrop-blur-md shadow-md cursor-pointer"
         >
           <span>Skip to Website</span>

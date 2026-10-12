@@ -14,7 +14,7 @@ Maintain all wedding details in a centralized configuration file (`src/config/we
 - Couple Names: Yaswanth Sai & Lakshmi Mrudula
 - Wedding Dates: November 19, 20, and 21, 2026
 - Timezone: Central Time (America/Chicago, UTC-6)
-- Notification Recipient Email: yash.mrudula@gmail.com
+- Notification Recipient Email: aswinravi70@gmail.com
 - Central Venues:
   1. Sahvana Ranch: 752 JC Mapels Rd, Gunter, TX
   2. Lotus Spring Ranch: 4253 County Road 412, McKinney, TX 75071
@@ -132,7 +132,7 @@ Implement a tactile, realistic 3D royal Indian wedding envelope opening animatio
    - Local persistent JSON/SQLite store (`data/wedding_rsvps.json`) working out-of-the-box.
    - Cloud Supabase PostgreSQL integration via `server/schema.sql` with Row Level Security (RLS) policies.
 3. Email Notifications (Resend):
-   - Rich luxury HTML email notification dispatched to `yash.mrudula@gmail.com` on every RSVP.
+   - Rich luxury HTML email notification dispatched to `aswinravi70@gmail.com` on every RSVP.
    - Guest confirmation receipt email sent to the guest.
    - Safe logging fallback when API keys are not yet provided.
 ```

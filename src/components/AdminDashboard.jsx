@@ -276,7 +276,7 @@ export function AdminDashboard({ isOpen, onClose }) {
                     <h4 className="text-xs uppercase tracking-widest text-maroon-royal font-bold mb-3">
                       Expected Attendance by Celebration Event:
                     </h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {events.map((ev) => (
                         <div key={ev.id} className="p-3 bg-white rounded-xl border border-gold-200/80 text-center">
                           <span className="text-xs font-serif font-bold text-stone-800 line-clamp-1 block mb-1">
@@ -423,7 +423,14 @@ export function AdminDashboard({ isOpen, onClose }) {
                                   {Array.isArray(rsvp.selected_events) && rsvp.selected_events.length > 0 ? (
                                     <div className="flex flex-wrap gap-1 max-w-xs">
                                       {rsvp.selected_events.map((evId) => {
-                                        const found = events.find((e) => e.id === evId);
+                                        const found =
+                                          events.find((e) => e.id === evId) ||
+                                          (evId === 'haldi' || evId === 'pelli_ceremony'
+                                            ? events.find((e) => e.id === 'haldi_pelli')
+                                            : null) ||
+                                          (evId === 'mehendi' || evId === 'sangeeth'
+                                            ? events.find((e) => e.id === 'mehendi_sangeeth')
+                                            : null);
                                         return (
                                           <span
                                             key={evId}

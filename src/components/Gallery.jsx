@@ -54,7 +54,7 @@ export function Gallery() {
                 src={img.url}
                 alt={img.caption}
                 loading="lazy"
-                className="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-700"
+                className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-maroon-900/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
                 <div className="bg-cream-light/90 backdrop-blur-md px-4 py-2 rounded-full border border-gold-rich text-center transform translate-y-2 group-hover:translate-y-0 transition-transform">

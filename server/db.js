@@ -146,8 +146,7 @@ export const db = {
 
     const eventCounts = {
       mehendi_sangeeth: 0,
-      haldi: 0,
-      pelli_ceremony: 0,
+      haldi_pelli: 0,
       wedding_ceremony: 0,
     };
 
@@ -158,10 +157,16 @@ export const db = {
         totalExpectedAttendees += count;
 
         if (Array.isArray(rsvp.selected_events)) {
+          const accountedEvents = new Set();
           for (const evId of rsvp.selected_events) {
-            // Map legacy separate events if present
-            const normalizedId = (evId === 'mehendi' || evId === 'sangeeth') ? 'mehendi_sangeeth' : evId;
-            if (eventCounts[normalizedId] !== undefined) {
+            let normalizedId = evId;
+            if (evId === 'mehendi' || evId === 'sangeeth') {
+              normalizedId = 'mehendi_sangeeth';
+            } else if (evId === 'haldi' || evId === 'pelli_ceremony' || evId === 'haldi_pelli') {
+              normalizedId = 'haldi_pelli';
+            }
+            if (eventCounts[normalizedId] !== undefined && !accountedEvents.has(normalizedId)) {
+              accountedEvents.add(normalizedId);
               eventCounts[normalizedId] += count;
             }
           }

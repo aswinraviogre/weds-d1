@@ -42,7 +42,7 @@ export function OurStory() {
                       src={item.image}
                       alt={item.title}
                       loading="lazy"
-                      className="w-full h-80 sm:h-96 object-cover object-top transform group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-80 sm:h-96 object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-stone-900/20 group-hover:bg-transparent transition-colors" />
                     <div className="absolute top-4 left-4 bg-cream-light/90 px-3 py-1 rounded-full border border-gold-200 text-xs font-serif font-bold text-maroon-royal">

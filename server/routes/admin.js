@@ -60,9 +60,24 @@ adminRouter.get('/rsvps', requireAdminAuth, async (req, res) => {
 
     // Filter by event ID
     if (event && event !== 'all') {
-      rsvps = rsvps.filter(
-        (r) => Array.isArray(r.selected_events) && r.selected_events.includes(event)
-      );
+      rsvps = rsvps.filter((r) => {
+        if (!Array.isArray(r.selected_events)) return false;
+        if (event === 'haldi_pelli') {
+          return (
+            r.selected_events.includes('haldi_pelli') ||
+            r.selected_events.includes('haldi') ||
+            r.selected_events.includes('pelli_ceremony')
+          );
+        }
+        if (event === 'mehendi_sangeeth') {
+          return (
+            r.selected_events.includes('mehendi_sangeeth') ||
+            r.selected_events.includes('mehendi') ||
+            r.selected_events.includes('sangeeth')
+          );
+        }
+        return r.selected_events.includes(event);
+      });
     }
 
     // Filter by search string (name, email, phone)
