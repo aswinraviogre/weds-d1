@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
@@ -8,16 +9,25 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const LOCAL_DB_FILE = path.join(DATA_DIR, 'wedding_rsvps.json');
+const TMP_DB_FILE = path.join(os.tmpdir(), 'wedding_rsvps.json');
 
-// Ensure local data directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+// Check if local project data directory is writable (writable locally, read-only on Vercel)
+let isLocalDirWritable = false;
+try {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+  if (!fs.existsSync(LOCAL_DB_FILE)) {
+    fs.writeFileSync(LOCAL_DB_FILE, JSON.stringify([], null, 2), 'utf-8');
+  }
+  fs.accessSync(DATA_DIR, fs.constants.W_OK);
+  isLocalDirWritable = true;
+} catch {
+  isLocalDirWritable = false;
 }
 
-// Ensure local db file exists
-if (!fs.existsSync(LOCAL_DB_FILE)) {
-  fs.writeFileSync(LOCAL_DB_FILE, JSON.stringify([], null, 2), 'utf-8');
-}
+// In-memory cache across serverless warm requests
+globalThis.__weddingRsvpsCache = globalThis.__weddingRsvpsCache || null;
 
 // Check Supabase credentials
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -36,31 +46,75 @@ if (isSupabaseConfigured) {
     supabase = null;
   }
 } else {
-  console.log('[Database] Supabase credentials not found. Using local persistent storage at:', LOCAL_DB_FILE);
+  console.log('[Database] Supabase credentials not found. Using local/tmp persistent storage.');
 }
 
 // Helper for reading local JSON store
 function readLocalStore() {
-  try {
-    const raw = fs.readFileSync(LOCAL_DB_FILE, 'utf-8');
-    return JSON.parse(raw);
-  } catch (err) {
-    console.error('[Database] Error reading local store:', err);
-    return [];
+  if (Array.isArray(globalThis.__weddingRsvpsCache)) {
+    return [...globalThis.__weddingRsvpsCache];
   }
+
+  let records = [];
+
+  // 1. Try reading from TMP_DB_FILE (where serverless writes persist across invocations)
+  if (fs.existsSync(TMP_DB_FILE)) {
+    try {
+      const raw = fs.readFileSync(TMP_DB_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        records = parsed;
+      }
+    } catch (err) {
+      console.warn('[Database] Warning reading TMP store:', err.message);
+    }
+  }
+
+  // 2. If TMP store is empty or does not exist, read from bundled LOCAL_DB_FILE
+  if (records.length === 0 && fs.existsSync(LOCAL_DB_FILE)) {
+    try {
+      const raw = fs.readFileSync(LOCAL_DB_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        records = parsed;
+      }
+    } catch (err) {
+      console.warn('[Database] Warning reading bundled store:', err.message);
+    }
+  }
+
+  globalThis.__weddingRsvpsCache = records;
+  return records;
 }
 
 // Helper for writing local JSON store atomically
 function writeLocalStore(records) {
+  globalThis.__weddingRsvpsCache = records;
+  let wroteSuccessfully = false;
+
+  // 1. Always write to TMP_DB_FILE (guaranteed writable in Vercel serverless Lambda & local)
   try {
-    const tempFile = `${LOCAL_DB_FILE}.tmp`;
-    fs.writeFileSync(tempFile, JSON.stringify(records, null, 2), 'utf-8');
-    fs.renameSync(tempFile, LOCAL_DB_FILE);
-    return true;
+    const tempTmpFile = `${TMP_DB_FILE}.${Date.now()}.tmp`;
+    fs.writeFileSync(tempTmpFile, JSON.stringify(records, null, 2), 'utf-8');
+    fs.renameSync(tempTmpFile, TMP_DB_FILE);
+    wroteSuccessfully = true;
   } catch (err) {
-    console.error('[Database] Error writing local store:', err);
-    return false;
+    console.warn('[Database] Warning writing to TMP store:', err.message);
   }
+
+  // 2. If local project directory is writable (e.g. local dev), also write to LOCAL_DB_FILE
+  if (isLocalDirWritable) {
+    try {
+      const tempLocalFile = `${LOCAL_DB_FILE}.${Date.now()}.tmp`;
+      fs.writeFileSync(tempLocalFile, JSON.stringify(records, null, 2), 'utf-8');
+      fs.renameSync(tempLocalFile, LOCAL_DB_FILE);
+      wroteSuccessfully = true;
+    } catch {
+      // Read-only filesystem is expected in serverless environments
+    }
+  }
+
+  return wroteSuccessfully;
 }
 
 export const db = {
@@ -93,7 +147,6 @@ export const db = {
           console.warn('[Database] Supabase insert failed, falling back to local file store:', error.message);
         } else {
           console.log('[Database] Saved RSVP to Supabase:', data.id);
-          // Also sync to local backup
           const current = readLocalStore();
           current.unshift(record);
           writeLocalStore(current);
@@ -104,11 +157,11 @@ export const db = {
       }
     }
 
-    // Default or fallback: Save to local persistent JSON file
+    // Default or fallback: Save to local persistent JSON file / tmp store
     const records = readLocalStore();
     records.unshift(record);
     writeLocalStore(records);
-    console.log('[Database] Saved RSVP to local database:', record.id, record.guest_name);
+    console.log('[Database] Saved RSVP to database:', record.id, record.guest_name);
     return record;
   },
 

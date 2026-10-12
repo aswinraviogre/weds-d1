@@ -381,14 +381,21 @@ export function AdminDashboard({ isOpen, onClose }) {
                                   <div className="font-semibold text-stone-900 text-sm">
                                     {rsvp.guest_name}
                                   </div>
-                                  <div className="text-stone-500 flex items-center space-x-1.5 mt-0.5">
-                                    <Mail className="w-3 h-3 text-gold-deep" />
-                                    <span>{rsvp.guest_email}</span>
-                                  </div>
-                                  {rsvp.phone_number && (
+                                  {rsvp.guest_email ? (
+                                    <div className="text-stone-500 flex items-center space-x-1.5 mt-0.5">
+                                      <Mail className="w-3 h-3 text-gold-deep" />
+                                      <span>{rsvp.guest_email}</span>
+                                    </div>
+                                  ) : null}
+                                  {rsvp.phone_number ? (
                                     <div className="text-stone-500 flex items-center space-x-1.5 mt-0.5">
                                       <Phone className="w-3 h-3 text-gold-deep" />
                                       <span>{rsvp.phone_number}</span>
+                                    </div>
+                                  ) : null}
+                                  {!rsvp.guest_email && !rsvp.phone_number && (
+                                    <div className="text-stone-400 italic text-[11px] mt-0.5">
+                                      No contact provided
                                     </div>
                                   )}
                                   {rsvp.additional_guests && (
