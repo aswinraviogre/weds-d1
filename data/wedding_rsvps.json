@@ -1,5 +1,131 @@
 [
   {
+    "id": "493a95de-3d21-442d-ba96-696d36fc79d9",
+    "guest_name": "Blank Phone Guest",
+    "guest_email": "blank.phone@example.com",
+    "phone_number": null,
+    "attendance_status": "attending",
+    "attendees_count": 1,
+    "additional_guests": "",
+    "selected_events": [
+      "wedding_ceremony"
+    ],
+    "dietary_requirements": "",
+    "special_requests": "",
+    "ip_address": "::1",
+    "created_at": "2026-10-12T06:28:37.288Z"
+  },
+  {
+    "id": "8773476e-1407-41fb-baed-3b949cc226c4",
+    "guest_name": "Valued Guest",
+    "guest_email": "",
+    "phone_number": null,
+    "attendance_status": "attending",
+    "attendees_count": 1,
+    "additional_guests": "",
+    "selected_events": [
+      "haldi_pelli"
+    ],
+    "dietary_requirements": "",
+    "special_requests": "",
+    "ip_address": "::1",
+    "created_at": "2026-10-12T06:28:37.259Z"
+  },
+  {
+    "id": "504e82c9-a6ca-4712-968a-7963b89036bd",
+    "guest_name": "Only Name Visitor",
+    "guest_email": "",
+    "phone_number": null,
+    "attendance_status": "attending",
+    "attendees_count": 1,
+    "additional_guests": "",
+    "selected_events": [],
+    "dietary_requirements": "",
+    "special_requests": "",
+    "ip_address": "::1",
+    "created_at": "2026-10-12T06:28:37.242Z"
+  },
+  {
+    "id": "0bd56958-6593-4d9f-8457-a17048059d39",
+    "guest_name": "Ananya Reddy",
+    "guest_email": "ananya.reddy@example.com",
+    "phone_number": "+1 (512) 555-0244",
+    "attendance_status": "declined",
+    "attendees_count": 0,
+    "additional_guests": "",
+    "selected_events": [],
+    "dietary_requirements": "",
+    "special_requests": "Sending so much love from London! Wish I could be there.",
+    "ip_address": "::1",
+    "created_at": "2026-10-12T06:28:37.214Z"
+  },
+  {
+    "id": "1a8b5976-c786-48fb-ac5a-d5830fb72dfd",
+    "guest_name": "Dr. Ramesh Sharma",
+    "guest_email": "ramesh.sharma@example.com",
+    "phone_number": "+1 (214) 555-0199",
+    "attendance_status": "attending",
+    "attendees_count": 2,
+    "additional_guests": "Priya Sharma",
+    "selected_events": [
+      "mehendi",
+      "sangeeth",
+      "wedding_ceremony"
+    ],
+    "dietary_requirements": "Strict Vegetarian / No Garlic",
+    "special_requests": "Heartiest congratulations to Yaswanth and Lakshmi!",
+    "ip_address": "::1",
+    "created_at": "2026-10-12T06:28:37.190Z"
+  },
+  {
+    "id": "e9806c9d-1e1e-4110-85b9-282cfa5013c1",
+    "guest_name": "Blank Phone Guest",
+    "guest_email": "blank.phone@example.com",
+    "phone_number": null,
+    "attendance_status": "attending",
+    "attendees_count": 1,
+    "additional_guests": "",
+    "selected_events": [
+      "wedding_ceremony"
+    ],
+    "dietary_requirements": "",
+    "special_requests": "",
+    "ip_address": "::1",
+    "created_at": "2026-10-12T06:18:48.809Z"
+  },
+  {
+    "id": "3ef1b3e5-63d3-46fc-a1c6-9d62c5753222",
+    "guest_name": "Ananya Reddy",
+    "guest_email": "ananya.reddy@example.com",
+    "phone_number": "+1 (512) 555-0244",
+    "attendance_status": "declined",
+    "attendees_count": 0,
+    "additional_guests": "",
+    "selected_events": [],
+    "dietary_requirements": "",
+    "special_requests": "Sending so much love from London! Wish I could be there.",
+    "ip_address": "::1",
+    "created_at": "2026-10-12T06:18:48.776Z"
+  },
+  {
+    "id": "7ba51d8b-4fbd-4c56-aa52-f6965a01695d",
+    "guest_name": "Dr. Ramesh Sharma",
+    "guest_email": "ramesh.sharma@example.com",
+    "phone_number": "+1 (214) 555-0199",
+    "attendance_status": "attending",
+    "attendees_count": 2,
+    "additional_guests": "Priya Sharma",
+    "selected_events": [
+      "mehendi",
+      "sangeeth",
+      "wedding_ceremony"
+    ],
+    "dietary_requirements": "Strict Vegetarian / No Garlic",
+    "special_requests": "Heartiest congratulations to Yaswanth and Lakshmi!",
+    "ip_address": "::1",
+    "created_at": "2026-10-12T06:18:48.756Z"
+  },
+  {
     "id": "a1a260fd-9cd6-44c4-a656-e46086708459",
     "guest_name": "Ananya Reddy",
     "guest_email": "ananya.reddy@example.com",

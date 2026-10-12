@@ -62,10 +62,10 @@ async function runTests() {
     const data2 = await res2.json();
     assert(res2.status === 201 && data2.success === true, 'Declining RSVP saves successfully');
 
-    // 4. RSVP Validation Rejection (Empty name)
+    // 4. RSVP Validation Rejection (Invalid email format when provided)
     const invalidPayload = {
-      guest_name: '',
-      guest_email: 'bademail',
+      guest_name: 'Test Guest',
+      guest_email: 'bademailwithoutat',
       attendance_status: 'attending',
     };
     const res3 = await fetch(`${baseUrl}/api/rsvp`, {
@@ -73,7 +73,77 @@ async function runTests() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(invalidPayload),
     });
-    assert(res3.status === 400, 'Invalid RSVP rejected with 400 Bad Request');
+    assert(res3.status === 400, 'Invalid email format rejected with 400 Bad Request');
+
+    // 4a-1. Single-Field Submission: ONLY Name
+    const onlyNamePayload = {
+      guest_name: 'Only Name Visitor',
+    };
+    const resOnlyName = await fetch(`${baseUrl}/api/rsvp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(onlyNamePayload),
+    });
+    const dataOnlyName = await resOnlyName.json();
+    assert(
+      resOnlyName.status === 201 && dataOnlyName.success === true,
+      'Single-field submission (ONLY name) saves successfully'
+    );
+
+    // 4a-2. Single-Field Submission: ONLY Selected Events (no name, no email)
+    const onlyEventsPayload = {
+      selected_events: ['haldi_pelli'],
+    };
+    const resOnlyEvents = await fetch(`${baseUrl}/api/rsvp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(onlyEventsPayload),
+    });
+    const dataOnlyEvents = await resOnlyEvents.json();
+    assert(
+      resOnlyEvents.status === 201 && dataOnlyEvents.success === true,
+      'Single-field submission (ONLY selected event) saves successfully'
+    );
+
+    // 4b. RSVP Validation Rejection (Invalid phone pattern)
+    const invalidPhonePayload = {
+      guest_name: 'Test Guest',
+      guest_email: 'test.phone@example.com',
+      phone_number: 'invalid-phone-abc!@#',
+      attendance_status: 'attending',
+      attendees_count: 1,
+      selected_events: ['wedding_ceremony'],
+    };
+    const resPhoneInvalid = await fetch(`${baseUrl}/api/rsvp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(invalidPhonePayload),
+    });
+    const dataPhoneInvalid = await resPhoneInvalid.json();
+    assert(
+      resPhoneInvalid.status === 400 && dataPhoneInvalid.error.includes('valid phone number'),
+      'Invalid phone number pattern correctly rejected with 400'
+    );
+
+    // 4c. RSVP Empty Phone Number correctly cast to null
+    const emptyPhonePayload = {
+      guest_name: 'Blank Phone Guest',
+      guest_email: 'blank.phone@example.com',
+      phone_number: '   ',
+      attendance_status: 'attending',
+      attendees_count: 1,
+      selected_events: ['wedding_ceremony'],
+    };
+    const resPhoneEmpty = await fetch(`${baseUrl}/api/rsvp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(emptyPhonePayload),
+    });
+    const dataPhoneEmpty = await resPhoneEmpty.json();
+    assert(
+      resPhoneEmpty.status === 201 && dataPhoneEmpty.success === true,
+      'Whitespace/empty phone number successfully accepted and cast to null'
+    );
 
     // 5. Admin Passcode Verification
     const authWrong = await fetch(`${baseUrl}/api/admin/verify`, {

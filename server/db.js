@@ -72,9 +72,9 @@ export const db = {
   async saveRsvp(rsvpData) {
     const record = {
       id: crypto.randomUUID(),
-      guest_name: rsvpData.guest_name.trim(),
-      guest_email: rsvpData.guest_email.trim().toLowerCase(),
-      phone_number: rsvpData.phone_number ? rsvpData.phone_number.trim() : '',
+      guest_name: (rsvpData.guest_name && String(rsvpData.guest_name).trim()) || 'Valued Guest',
+      guest_email: (rsvpData.guest_email && String(rsvpData.guest_email).trim().toLowerCase()) || '',
+      phone_number: rsvpData.phone_number && String(rsvpData.phone_number).trim() ? String(rsvpData.phone_number).trim() : null,
       attendance_status: rsvpData.attendance_status, // 'attending' | 'declined'
       attendees_count: rsvpData.attendance_status === 'attending' ? parseInt(rsvpData.attendees_count, 10) || 1 : 0,
       additional_guests: rsvpData.additional_guests ? rsvpData.additional_guests.trim() : '',

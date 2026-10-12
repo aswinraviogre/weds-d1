@@ -81,23 +81,21 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
   const validateForm = () => {
     const errs = {};
 
-    if (!formData.guest_name.trim() || formData.guest_name.trim().length < 2) {
-      errs.guest_name = 'Please enter your full name.';
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.guest_email.trim() || !emailRegex.test(formData.guest_email.trim())) {
-      errs.guest_email = 'Please provide a valid email address.';
-    }
-
-    if (formData.attendance_status === 'attending') {
-      const count = parseInt(formData.attendees_count, 10);
-      if (isNaN(count) || count < 1 || count > 20) {
-        errs.attendees_count = 'Please enter a valid number of attendees (1–20).';
+    // Validate email format ONLY IF provided
+    if (formData.guest_email && formData.guest_email.trim().length > 0) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.guest_email.trim())) {
+        errs.guest_email = 'Please provide a valid email address.';
       }
+    }
 
-      if (formData.selected_events.length === 0) {
-        errs.selected_events = 'Please select at least one celebration event you will attend.';
+    // Optional phone validation: if provided, must match valid international pattern
+    if (formData.phone_number && formData.phone_number.trim().length > 0) {
+      const cleanPhone = formData.phone_number.trim();
+      const phoneRegex = /^\+?[0-9\s\-().]{7,25}$/;
+      const digitsOnly = cleanPhone.replace(/\D/g, '');
+      if (!phoneRegex.test(cleanPhone) || digitsOnly.length < 7 || digitsOnly.length > 15) {
+        errs.phone_number = 'Please enter a valid phone number (e.g. +1 (555) 123-4567 or +91 98765 43210).';
       }
     }
 
@@ -117,10 +115,18 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
     setIsSubmitting(true);
 
     try {
+      const payload = {
+        ...formData,
+        guest_name: formData.guest_name.trim() || 'Valued Guest',
+        guest_email: formData.guest_email.trim(),
+        phone_number: formData.phone_number.trim() ? formData.phone_number.trim() : null,
+        attendees_count: isAttending ? (parseInt(formData.attendees_count, 10) || 1) : 0,
+      };
+
       const response = await fetch('/api/rsvp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();
@@ -278,7 +284,7 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
               {/* Full Name */}
               <div>
                 <label className="block text-xs uppercase tracking-wider text-stone-700 font-semibold mb-2">
-                  Full Name <span className="text-maroon-royal">*</span>
+                  Full Name <span className="text-stone-400 font-normal">(Optional)</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
@@ -286,7 +292,6 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                   </div>
                   <input
                     type="text"
-                    required
                     placeholder="e.g. Ramesh Kumar"
                     value={formData.guest_name}
                     onChange={(e) => {
@@ -313,7 +318,7 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
               {/* Email Address */}
               <div>
                 <label className="block text-xs uppercase tracking-wider text-stone-700 font-semibold mb-2">
-                  Email Address <span className="text-maroon-royal">*</span>
+                  Email Address <span className="text-stone-400 font-normal">(Optional)</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
@@ -321,7 +326,6 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                   </div>
                   <input
                     type="email"
-                    required
                     placeholder="e.g. guest@example.com"
                     value={formData.guest_email}
                     onChange={(e) => {
@@ -358,17 +362,32 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                     type="tel"
                     placeholder="e.g. +1 (555) 123-4567"
                     value={formData.phone_number}
-                    onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gold-200 bg-white focus:outline-none focus:border-gold-rich focus:ring-2 focus:ring-gold-100 transition-all text-sm"
+                    onChange={(e) => {
+                      setFormData({ ...formData, phone_number: e.target.value });
+                      if (errors.phone_number) {
+                        setErrors({ ...errors, phone_number: null });
+                      }
+                    }}
+                    className={`w-full pl-10 pr-4 py-3 rounded-xl border bg-white focus:outline-none focus:ring-2 transition-all text-sm ${
+                      errors.phone_number
+                        ? 'border-red-400 focus:ring-red-200'
+                        : 'border-gold-200 focus:border-gold-rich focus:ring-gold-100'
+                    }`}
                   />
                 </div>
+                {errors.phone_number && (
+                  <p className="text-xs text-red-600 mt-1.5 flex items-center space-x-1">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0 inline" />
+                    <span>{errors.phone_number}</span>
+                  </p>
+                )}
               </div>
 
               {/* Number of Attendees (Only when attending) */}
               {isAttending && (
                 <div>
                   <label className="block text-xs uppercase tracking-wider text-stone-700 font-semibold mb-2">
-                    Total Number of Attendees <span className="text-maroon-royal">*</span>
+                    Total Number of Attendees <span className="text-stone-400 font-normal">(Optional)</span>
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
@@ -378,7 +397,6 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                       type="number"
                       min="1"
                       max="20"
-                      required
                       value={formData.attendees_count}
                       onChange={(e) => {
                         const val = parseInt(e.target.value, 10) || 1;

@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS public.rsvps (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     guest_name TEXT NOT NULL,
     guest_email TEXT NOT NULL,
-    phone_number TEXT,
+    phone_number TEXT CHECK (phone_number IS NULL OR phone_number ~ '^\+?[0-9\s\-().]{7,25}$'),
     attendance_status TEXT NOT NULL CHECK (attendance_status IN ('attending', 'declined')),
     attendees_count INTEGER NOT NULL DEFAULT 1 CHECK (attendees_count >= 0),
     additional_guests TEXT,

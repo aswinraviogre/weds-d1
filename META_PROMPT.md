@@ -110,7 +110,9 @@ Implement a tactile, realistic 3D royal Indian wedding envelope opening animatio
 6. Photo Gallery:
    - Responsive masonry grid with fullscreen modal lightbox viewer.
 7. Multi-Event RSVP Form:
-   - Inputs: Full name (req), Email (req), Phone (opt), Attendance (Joyfully Accept / Regretfully Decline), Number of attendees (req if accepting), Additional guests, Dietary needs, Special requests.
+   - Inputs: Full name (opt), Email (opt), Phone (opt, validated against international pattern `^\+?[0-9\s\-().]{7,25}$`), Attendance (Joyfully Accept / Regretfully Decline), Number of attendees (opt, default 1 if accepting), Additional guests, Dietary needs, Special requests.
+   - Flexible Submission Contract: No field is strictly mandatory. Guests can submit by providing any single piece of information (e.g. only name, or only selected events, or only phone/message) without error.
+   - Phone Number Validation Contract: Optional field; if provided, must match international format (`^\+?[0-9\s\-().]{7,25}$` with 7–15 digits). Empty or blank phone numbers must be cast to `null` to avoid database check constraint or schema pattern mismatch errors.
    - 4 Event Checkbox Cards: guests can select any combination!
    - Inline validation, duplicate prevention, loading spinner.
    - Confirmation Screen: Exact romantic message specified by couple with celebratory confetti.
@@ -123,14 +125,16 @@ Implement a tactile, realistic 3D royal Indian wedding envelope opening animatio
 
 ### 5. BACKEND, PERSISTENCE & EMAIL ARCHITECTURE
 1. Node.js & Express API Server (`/api`):
-   - `POST /api/rsvp`: Validates input, applies rate-limiting, saves to DB, dispatches email notifications.
+   - `POST /api/rsvp`:
+     - Server-side validation & Flexible Data Ingestion: No field is strictly mandatory. Unspecified names default to 'Valued Guest'. Email and Phone are validated for pattern correctness only if actually provided. Empty phone numbers are cast to `null`.
+     - Rate-limiting (10 requests per 15 min per IP), persists record, dispatches email notifications.
    - `POST /api/admin/verify`: Validates admin passcode (`yashmrudula2026`).
    - `GET /api/admin/stats`: Returns submissions count, attending vs declining, total expected attendees, and per-event attendance breakdown.
    - `GET /api/admin/rsvps`: Returns all RSVPs with search, event filters, status filters, and sorting.
    - `GET /api/admin/export`: Downloads complete RSVPs as an RFC-compliant CSV.
 2. Dual-Mode Database Persistence:
    - Local persistent JSON/SQLite store (`data/wedding_rsvps.json`) working out-of-the-box.
-   - Cloud Supabase PostgreSQL integration via `server/schema.sql` with Row Level Security (RLS) policies.
+   - Cloud Supabase PostgreSQL integration via `server/schema.sql` with Row Level Security (RLS) policies and `CHECK (phone_number IS NULL OR phone_number ~ '^\+?[0-9\s\-().]{7,25}$')`.
 3. Email Notifications (Resend):
    - Rich luxury HTML email notification dispatched to `aswinravi70@gmail.com` on every RSVP.
    - Guest confirmation receipt email sent to the guest.

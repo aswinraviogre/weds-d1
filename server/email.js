@@ -76,7 +76,7 @@ function createAdminEmailHtml(rsvp) {
             </tr>
             <tr>
               <td style="color: #78716c;">Email Address:</td>
-              <td style="color: #1c1917;"><a href="mailto:${rsvp.guest_email}" style="color: #a67d1e; text-decoration: none;">${rsvp.guest_email}</a></td>
+              <td style="color: #1c1917;">${rsvp.guest_email ? `<a href="mailto:${rsvp.guest_email}" style="color: #a67d1e; text-decoration: none;">${rsvp.guest_email}</a>` : '<em>Not provided</em>'}</td>
             </tr>
             <tr>
               <td style="color: #78716c;">Phone Number:</td>

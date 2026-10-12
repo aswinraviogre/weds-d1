@@ -50,40 +50,64 @@ rsvpRouter.post('/', async (req, res) => {
       special_requests,
     } = req.body;
 
-    // --- Server-side Validations ---
-    if (!guest_name || typeof guest_name !== 'string' || guest_name.trim().length < 2) {
-      return res.status(400).json({ error: 'Please provide your full name (minimum 2 characters).' });
-    }
+    // --- Server-side Validations & Data Normalization ---
+    // Guests can submit with any combination of details; no field is strictly mandatory.
+    const cleanName =
+      guest_name && typeof guest_name === 'string' && guest_name.trim().length > 0
+        ? guest_name.trim()
+        : 'Valued Guest';
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!guest_email || typeof guest_email !== 'string' || !emailRegex.test(guest_email.trim())) {
-      return res.status(400).json({ error: 'Please provide a valid email address.' });
-    }
+    const cleanEmail =
+      guest_email && typeof guest_email === 'string' && guest_email.trim().length > 0
+        ? guest_email.trim()
+        : '';
 
-    if (!attendance_status || !['attending', 'declined'].includes(attendance_status)) {
-      return res.status(400).json({ error: 'Please indicate whether you will be joining us.' });
-    }
-
-    const isAttending = attendance_status === 'attending';
-
-    if (isAttending) {
-      const count = parseInt(attendees_count, 10);
-      if (isNaN(count) || count < 1 || count > 20) {
-        return res.status(400).json({ error: 'Please enter a valid number of attendees (1 to 20).' });
+    // Only validate email pattern IF an email was actually provided
+    if (cleanEmail.length > 0) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(cleanEmail)) {
+        return res.status(400).json({ error: 'Please provide a valid email address.' });
       }
+    }
 
-      if (!Array.isArray(selected_events) || selected_events.length === 0) {
-        return res.status(400).json({ error: 'Please select at least one celebration event you will attend.' });
+    const effectiveStatus = attendance_status === 'declined' ? 'declined' : 'attending';
+    const isAttending = effectiveStatus === 'attending';
+
+    let count = 1;
+    if (isAttending && attendees_count !== undefined && attendees_count !== null && attendees_count !== '') {
+      const parsedCount = parseInt(attendees_count, 10);
+      if (!isNaN(parsedCount) && parsedCount >= 1 && parsedCount <= 50) {
+        count = parsedCount;
+      }
+    } else if (!isAttending) {
+      count = 0;
+    }
+
+    // --- Phone Number Validation & Data Casting ---
+    let validatedPhone = null;
+    if (phone_number !== undefined && phone_number !== null) {
+      const cleanPhone = String(phone_number).trim();
+      if (cleanPhone.length > 0) {
+        // Accepts optional '+' followed by digits, spaces, hyphens, dots, and parentheses
+        const phoneRegex = /^\+?[0-9\s\-().]{7,25}$/;
+        const digitsOnly = cleanPhone.replace(/\D/g, '');
+
+        if (!phoneRegex.test(cleanPhone) || digitsOnly.length < 7 || digitsOnly.length > 15) {
+          return res.status(400).json({
+            error: 'Please enter a valid phone number (e.g. +1 (555) 123-4567 or +91 98765 43210).',
+          });
+        }
+        validatedPhone = cleanPhone;
       }
     }
 
     // Prepare payload
     const rsvpData = {
-      guest_name: guest_name.trim(),
-      guest_email: guest_email.trim(),
-      phone_number: phone_number ? String(phone_number).trim() : '',
-      attendance_status,
-      attendees_count: isAttending ? parseInt(attendees_count, 10) : 0,
+      guest_name: cleanName,
+      guest_email: cleanEmail,
+      phone_number: validatedPhone,
+      attendance_status: effectiveStatus,
+      attendees_count: count,
       additional_guests: additional_guests ? String(additional_guests).trim() : '',
       selected_events: isAttending && Array.isArray(selected_events) ? selected_events : [],
       dietary_requirements: dietary_requirements ? String(dietary_requirements).trim() : '',
