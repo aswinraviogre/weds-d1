@@ -1,3 +1,6 @@
+import 'dotenv/config';
+import { googleSheetsService } from './googleSheets.js';
+
 // Automated Test Suite for Wedding RSVP API and Admin Portal
 const baseUrl = 'http://localhost:5000';
 const adminPasscode = 'yashmrudula2026';
@@ -174,6 +177,17 @@ async function runTests() {
     const exportRes = await fetch(`${baseUrl}/api/admin/export?passcode=${adminPasscode}`);
     const csvText = await exportRes.text();
     assert(exportRes.status === 200 && csvText.includes('Guest Name'), 'CSV export endpoint returns proper CSV document');
+
+    // 8. Google Sheets Web App Endpoint Integration
+    const sheetSync = await googleSheetsService.pushRsvp({
+      id: 'test-verification-id',
+      guest_name: 'Test Integration Guest',
+      attendance_status: 'attending',
+      attendees_count: 1,
+      selected_events: ['wedding_ceremony'],
+      special_requests: 'Google Sheets sync test verification',
+    });
+    assert(sheetSync.success === true, 'Google Sheets Web App endpoint accepts live RSVP data');
 
     console.log(`\n🎉 Results: ${passed}/${total} tests passed successfully!`);
   } catch (err) {

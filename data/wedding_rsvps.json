@@ -1,5 +1,83 @@
 [
   {
+    "id": "a15bec28-16d5-46b5-8510-b8cb4b248fd6",
+    "guest_name": "Blank Phone Guest",
+    "guest_email": "blank.phone@example.com",
+    "phone_number": null,
+    "attendance_status": "attending",
+    "attendees_count": 1,
+    "additional_guests": "",
+    "selected_events": [
+      "wedding_ceremony"
+    ],
+    "dietary_requirements": "",
+    "special_requests": "",
+    "ip_address": "::1",
+    "created_at": "2026-10-12T07:23:29.523Z"
+  },
+  {
+    "id": "23ce748c-3fc8-4ab5-b9f8-da5ba25a1f6a",
+    "guest_name": "Valued Guest",
+    "guest_email": "",
+    "phone_number": null,
+    "attendance_status": "attending",
+    "attendees_count": 1,
+    "additional_guests": "",
+    "selected_events": [
+      "haldi_pelli"
+    ],
+    "dietary_requirements": "",
+    "special_requests": "",
+    "ip_address": "::1",
+    "created_at": "2026-10-12T07:23:29.490Z"
+  },
+  {
+    "id": "6fc3ecdd-0075-4ee0-ac2f-49b2158bfbe9",
+    "guest_name": "Only Name Visitor",
+    "guest_email": "",
+    "phone_number": null,
+    "attendance_status": "attending",
+    "attendees_count": 1,
+    "additional_guests": "",
+    "selected_events": [],
+    "dietary_requirements": "",
+    "special_requests": "",
+    "ip_address": "::1",
+    "created_at": "2026-10-12T07:23:29.465Z"
+  },
+  {
+    "id": "d3d37bf3-28f1-4b38-bd87-8f23c9224e45",
+    "guest_name": "Ananya Reddy",
+    "guest_email": "ananya.reddy@example.com",
+    "phone_number": "+1 (512) 555-0244",
+    "attendance_status": "declined",
+    "attendees_count": 0,
+    "additional_guests": "",
+    "selected_events": [],
+    "dietary_requirements": "",
+    "special_requests": "Sending so much love from London! Wish I could be there.",
+    "ip_address": "::1",
+    "created_at": "2026-10-12T07:23:29.419Z"
+  },
+  {
+    "id": "10ea4c30-f657-4f39-8213-5ddd3d84674c",
+    "guest_name": "Dr. Ramesh Sharma",
+    "guest_email": "ramesh.sharma@example.com",
+    "phone_number": "+1 (214) 555-0199",
+    "attendance_status": "attending",
+    "attendees_count": 2,
+    "additional_guests": "Priya Sharma",
+    "selected_events": [
+      "mehendi",
+      "sangeeth",
+      "wedding_ceremony"
+    ],
+    "dietary_requirements": "Strict Vegetarian / No Garlic",
+    "special_requests": "Heartiest congratulations to Yaswanth and Lakshmi!",
+    "ip_address": "::1",
+    "created_at": "2026-10-12T07:23:29.159Z"
+  },
+  {
     "id": "e5a93782-0bc3-443f-ae50-b54348564dee",
     "guest_name": "Valued Guest",
     "guest_email": "",

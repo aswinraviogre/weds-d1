@@ -139,4 +139,9 @@ Implement a tactile, realistic 3D royal Indian wedding envelope opening animatio
    - Rich luxury HTML email notification dispatched to `aswinravi70@gmail.com` on every RSVP.
    - Guest confirmation receipt email sent to the guest.
    - Safe logging fallback when API keys are not yet provided.
+4. Google Sheets Web App Live Integration:
+   - Deployment ID: `AKfycbywwYLX9rusWin3N_bIyM5F-WvN4D4g3nDiw7gstKwsH-XlZb8NvNIF1S-0HtxlRkpssw`
+   - Web App URL: Retrieved dynamically from `GOOGLE_SHEETS_WEB_APP_URL` environment variable (default: `https://script.google.com/macros/s/AKfycbywwYLX9rusWin3N_bIyM5F-WvN4D4g3nDiw7gstKwsH-XlZb8NvNIF1S-0HtxlRkpssw/exec`).
+   - Automatic Real-Time Push: The RSVP controller (`server/routes/rsvp.js`) fires an asynchronous POST fetch request on every submission to log guest name, email, phone, attendance status, attendee count, celebration events (guaranteed array format), and special notes directly into the Google Sheet.
+   - Non-Blocking & Resilient: Handled in background with error catching so Google Sheets network latency never delays guest RSVP confirmation.
 ```

@@ -1,6 +1,7 @@
 import express from 'express';
 import { db } from '../db.js';
 import { emailService } from '../email.js';
+import { googleSheetsService } from '../googleSheets.js';
 
 export const rsvpRouter = express.Router();
 
@@ -121,6 +122,11 @@ rsvpRouter.post('/', async (req, res) => {
     // 2. Dispatch email notification in background (never fail the RSVP response if email fails)
     emailService.sendRsvpNotifications(savedRecord).catch((err) => {
       console.error('[RSVP Route] Email sending failed in background:', err.message);
+    });
+
+    // 3. Dispatch to Google Sheets Web App endpoint in background
+    googleSheetsService.pushRsvp(savedRecord).catch((err) => {
+      console.error('[RSVP Route] Google Sheets sync failed in background:', err.message);
     });
 
     return res.status(201).json({
