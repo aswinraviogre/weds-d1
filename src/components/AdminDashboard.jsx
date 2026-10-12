@@ -23,14 +23,40 @@ import { weddingConfig } from '../config/weddingConfig';
 export function AdminDashboard({ isOpen, onClose }) {
   const { events } = weddingConfig;
 
-  const [passcode, setPasscode] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passcode, setPasscode] = useState(() => {
+    try {
+      return localStorage.getItem('wedding_admin_passcode') || '';
+    } catch {
+      return '';
+    }
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    try {
+      return Boolean(localStorage.getItem('wedding_admin_passcode'));
+    } catch {
+      return false;
+    }
+  });
   const [authError, setAuthError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // Data states
-  const [stats, setStats] = useState(null);
-  const [rsvps, setRsvps] = useState([]);
+  // Data states with immediate localStorage cached fallback
+  const [stats, setStats] = useState(() => {
+    try {
+      const cached = localStorage.getItem('wedding_cached_stats');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [rsvps, setRsvps] = useState(() => {
+    try {
+      const cached = localStorage.getItem('wedding_cached_rsvps');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
   const [isLoadingData, setIsLoadingData] = useState(false);
 
   // Filters
@@ -40,16 +66,26 @@ export function AdminDashboard({ isOpen, onClose }) {
   const [sortOrder, setSortOrder] = useState('newest');
 
   // Load stats and RSVPs once authenticated
-  const loadDashboardData = async (activePasscode = passcode) => {
+  const loadDashboardData = async (activePasscode) => {
+    const code =
+      activePasscode ||
+      passcode ||
+      (typeof localStorage !== 'undefined' ? localStorage.getItem('wedding_admin_passcode') : '') ||
+      '';
+    if (!code) return;
+
     setIsLoadingData(true);
     try {
       // 1. Fetch Stats
       const statsRes = await fetch('/api/admin/stats', {
-        headers: { 'x-admin-passcode': activePasscode },
+        headers: { 'x-admin-passcode': code },
       });
       const statsData = await statsRes.json();
       if (statsRes.ok && statsData.success) {
         setStats(statsData.data);
+        try {
+          localStorage.setItem('wedding_cached_stats', JSON.stringify(statsData.data));
+        } catch (e) {}
       }
 
       // 2. Fetch RSVPs with current filters
@@ -61,11 +97,31 @@ export function AdminDashboard({ isOpen, onClose }) {
       });
 
       const rsvpsRes = await fetch(`/api/admin/rsvps?${params.toString()}`, {
-        headers: { 'x-admin-passcode': activePasscode },
+        headers: { 'x-admin-passcode': code },
       });
       const rsvpsData = await rsvpsRes.json();
-      if (rsvpsRes.ok && rsvpsData.success) {
-        setRsvps(rsvpsData.data);
+      if (rsvpsRes.ok && rsvpsData.success && Array.isArray(rsvpsData.data)) {
+        let mergedList = [...rsvpsData.data];
+        try {
+          const clientSaved = JSON.parse(localStorage.getItem('wedding_client_rsvps') || '[]');
+          if (Array.isArray(clientSaved) && clientSaved.length > 0) {
+            const existingIds = new Set(
+              mergedList.map((r) => r.id || `${r.guest_email}_${r.guest_name}`)
+            );
+            for (const clientRsvp of clientSaved) {
+              const key = clientRsvp.id || `${clientRsvp.guest_email}_${clientRsvp.guest_name}`;
+              if (!existingIds.has(key)) {
+                mergedList.unshift(clientRsvp);
+                existingIds.add(key);
+              }
+            }
+          }
+        } catch (e) {}
+
+        setRsvps(mergedList);
+        try {
+          localStorage.setItem('wedding_cached_rsvps', JSON.stringify(mergedList));
+        } catch (e) {}
       }
     } catch (err) {
       console.error('Failed to load admin data:', err);
@@ -88,6 +144,9 @@ export function AdminDashboard({ isOpen, onClose }) {
 
       const data = await res.json();
       if (res.ok && data.success) {
+        try {
+          localStorage.setItem('wedding_admin_passcode', passcode);
+        } catch (e) {}
         setIsAuthenticated(true);
         loadDashboardData(passcode);
       } else {
@@ -100,11 +159,22 @@ export function AdminDashboard({ isOpen, onClose }) {
     }
   };
 
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem('wedding_admin_passcode');
+    } catch (e) {}
+    setIsAuthenticated(false);
+    setPasscode('');
+  };
+
+  // Automatically load on mount or when dashboard opens
   useEffect(() => {
-    if (isAuthenticated) {
-      loadDashboardData();
+    const savedPasscode =
+      typeof localStorage !== 'undefined' ? localStorage.getItem('wedding_admin_passcode') : null;
+    if (savedPasscode && isOpen) {
+      loadDashboardData(savedPasscode);
     }
-  }, [searchQuery, statusFilter, eventFilter, sortOrder]);
+  }, [isOpen, searchQuery, statusFilter, eventFilter, sortOrder]);
 
   const handleExportCsv = () => {
     window.location.href = `/api/admin/export?passcode=${encodeURIComponent(passcode)}`;
@@ -150,13 +220,23 @@ export function AdminDashboard({ isOpen, onClose }) {
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-2 text-stone-300 hover:text-white rounded-full hover:bg-maroon-800 transition-colors"
-            aria-label="Close Admin Modal"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center space-x-2">
+            {isAuthenticated && (
+              <button
+                onClick={handleLogout}
+                className="px-3 py-1.5 text-xs text-stone-200 hover:text-white rounded-lg border border-gold-rich/40 hover:bg-maroon-800 transition-colors uppercase tracking-wider font-semibold cursor-pointer"
+              >
+                Log Out
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="p-2 text-stone-300 hover:text-white rounded-full hover:bg-maroon-800 transition-colors cursor-pointer"
+              aria-label="Close Admin Modal"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Content Body */}

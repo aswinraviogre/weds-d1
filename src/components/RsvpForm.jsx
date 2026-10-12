@@ -135,6 +135,17 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
         throw new Error(result.error || 'Failed to submit RSVP. Please try again.');
       }
 
+      // Save client-side backup in localStorage
+      try {
+        const clientSaved = JSON.parse(localStorage.getItem('wedding_client_rsvps') || '[]');
+        clientSaved.unshift({
+          ...payload,
+          id: result.data?.id || `local-${Date.now()}`,
+          created_at: new Date().toISOString(),
+        });
+        localStorage.setItem('wedding_client_rsvps', JSON.stringify(clientSaved.slice(0, 50)));
+      } catch (e) {}
+
       // Successful submission callback
       if (onSuccessSubmission) {
         onSuccessSubmission({

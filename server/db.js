@@ -11,6 +11,9 @@ const DATA_DIR = path.join(__dirname, '..', 'data');
 const LOCAL_DB_FILE = path.join(DATA_DIR, 'wedding_rsvps.json');
 const TMP_DB_FILE = path.join(os.tmpdir(), 'wedding_rsvps.json');
 
+const HOME_DB_DIR = path.join(os.homedir(), '.wedding_portal');
+const HOME_DB_FILE = path.join(HOME_DB_DIR, 'wedding_rsvps.json');
+
 // Check if local project data directory is writable (writable locally, read-only on Vercel)
 let isLocalDirWritable = false;
 try {
@@ -25,6 +28,12 @@ try {
 } catch {
   isLocalDirWritable = false;
 }
+
+try {
+  if (!fs.existsSync(HOME_DB_DIR)) {
+    fs.mkdirSync(HOME_DB_DIR, { recursive: true });
+  }
+} catch {}
 
 // In-memory cache across serverless warm requests
 globalThis.__weddingRsvpsCache = globalThis.__weddingRsvpsCache || null;
@@ -49,72 +58,77 @@ if (isSupabaseConfigured) {
   console.log('[Database] Supabase credentials not found. Using local/tmp persistent storage.');
 }
 
-// Helper for reading local JSON store
-function readLocalStore() {
-  if (Array.isArray(globalThis.__weddingRsvpsCache)) {
-    return [...globalThis.__weddingRsvpsCache];
-  }
-
-  let records = [];
-
-  // 1. Try reading from TMP_DB_FILE (where serverless writes persist across invocations)
-  if (fs.existsSync(TMP_DB_FILE)) {
-    try {
-      const raw = fs.readFileSync(TMP_DB_FILE, 'utf-8');
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        records = parsed;
-      }
-    } catch (err) {
-      console.warn('[Database] Warning reading TMP store:', err.message);
-    }
-  }
-
-  // 2. If TMP store is empty or does not exist, read from bundled LOCAL_DB_FILE
-  if (records.length === 0 && fs.existsSync(LOCAL_DB_FILE)) {
-    try {
-      const raw = fs.readFileSync(LOCAL_DB_FILE, 'utf-8');
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        records = parsed;
-      }
-    } catch (err) {
-      console.warn('[Database] Warning reading bundled store:', err.message);
-    }
-  }
-
-  globalThis.__weddingRsvpsCache = records;
-  return records;
-}
-
-// Helper for writing local JSON store atomically
+// Helper for writing local JSON store to all redundant locations
 function writeLocalStore(records) {
   globalThis.__weddingRsvpsCache = records;
   let wroteSuccessfully = false;
 
-  // 1. Always write to TMP_DB_FILE (guaranteed writable in Vercel serverless Lambda & local)
-  try {
-    const tempTmpFile = `${TMP_DB_FILE}.${Date.now()}.tmp`;
-    fs.writeFileSync(tempTmpFile, JSON.stringify(records, null, 2), 'utf-8');
-    fs.renameSync(tempTmpFile, TMP_DB_FILE);
-    wroteSuccessfully = true;
-  } catch (err) {
-    console.warn('[Database] Warning writing to TMP store:', err.message);
-  }
+  const candidateFiles = [LOCAL_DB_FILE, HOME_DB_FILE, TMP_DB_FILE];
 
-  // 2. If local project directory is writable (e.g. local dev), also write to LOCAL_DB_FILE
-  if (isLocalDirWritable) {
+  for (const filePath of candidateFiles) {
     try {
-      const tempLocalFile = `${LOCAL_DB_FILE}.${Date.now()}.tmp`;
-      fs.writeFileSync(tempLocalFile, JSON.stringify(records, null, 2), 'utf-8');
-      fs.renameSync(tempLocalFile, LOCAL_DB_FILE);
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.writeFileSync(filePath, JSON.stringify(records, null, 2), 'utf-8');
       wroteSuccessfully = true;
-    } catch {
-      // Read-only filesystem is expected in serverless environments
+    } catch (err) {
+      // Ignored for read-only environments
     }
   }
 
   return wroteSuccessfully;
+}
+
+// Helper for reading and merging local JSON store from all redundant locations
+function readLocalStore() {
+  const recordsMap = new Map();
+  const candidateFiles = [LOCAL_DB_FILE, HOME_DB_FILE, TMP_DB_FILE];
+
+  for (const filePath of candidateFiles) {
+    if (fs.existsSync(filePath)) {
+      try {
+        const raw = fs.readFileSync(filePath, 'utf-8');
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          for (const item of parsed) {
+            if (item && item.id && !recordsMap.has(item.id)) {
+              recordsMap.set(item.id, item);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn(`[Database] Warning reading store from ${filePath}:`, err.message);
+      }
+    }
+  }
+
+  // Also include in-memory cache if any items exist
+  if (Array.isArray(globalThis.__weddingRsvpsCache)) {
+    for (const item of globalThis.__weddingRsvpsCache) {
+      if (item && item.id && !recordsMap.has(item.id)) {
+        recordsMap.set(item.id, item);
+      }
+    }
+  }
+
+  const allRecords = Array.from(recordsMap.values()).sort(
+    (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0)
+  );
+
+  globalThis.__weddingRsvpsCache = allRecords;
+
+  // Synchronize across all candidate storage locations
+  for (const filePath of candidateFiles) {
+    try {
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(filePath, JSON.stringify(allRecords, null, 2), 'utf-8');
+    } catch (e) {}
+  }
+
+  return allRecords;
 }
 
 export const db = {
