@@ -268,7 +268,11 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
               <button
                 type="button"
                 onClick={() => {
-                  setFormData((prev) => ({ ...prev, attendance_status: 'attending' }));
+                  setFormData((prev) => ({
+                    ...prev,
+                    attendance_status: 'attending',
+                    attendees_count: prev.attendees_count && Number(prev.attendees_count) > 0 ? prev.attendees_count : 1,
+                  }));
                   setErrors((prev) => {
                     const next = { ...prev };
                     delete next.attendance_status;
@@ -330,7 +334,7 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Full Name */}
               <div>
-                <label className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2">
+                <label htmlFor="guest_name" className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2 cursor-pointer">
                   Full Name <span className="text-ink/50 font-normal">(Optional)</span>
                 </label>
                 <div className="relative">
@@ -338,7 +342,10 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                     <User className="w-4 h-4" />
                   </div>
                   <input
+                    id="guest_name"
+                    name="guest_name"
                     type="text"
+                    autoComplete="name"
                     placeholder="e.g. Ramesh Kumar"
                     value={formData.guest_name}
                     onChange={(e) => {
@@ -364,7 +371,7 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
 
               {/* Email Address */}
               <div>
-                <label className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2">
+                <label htmlFor="guest_email" className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2 cursor-pointer">
                   Email Address <span className="text-ink/50 font-normal">(Optional)</span>
                 </label>
                 <div className="relative">
@@ -372,7 +379,10 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                     <Mail className="w-4 h-4" />
                   </div>
                   <input
+                    id="guest_email"
+                    name="guest_email"
                     type="email"
+                    autoComplete="email"
                     placeholder="e.g. guest@example.com"
                     value={formData.guest_email}
                     onChange={(e) => {
@@ -398,7 +408,7 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
 
               {/* Phone Number (Optional) */}
               <div>
-                <label className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2">
+                <label htmlFor="phone_number" className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2 cursor-pointer">
                   Phone Number <span className="text-ink/50 font-normal">(Optional)</span>
                 </label>
                 <div className="relative">
@@ -406,7 +416,10 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                     <Phone className="w-4 h-4" />
                   </div>
                   <input
+                    id="phone_number"
+                    name="phone_number"
                     type="tel"
+                    autoComplete="tel"
                     placeholder="e.g. +1 (555) 123-4567"
                     value={formData.phone_number}
                     onChange={(e) => {
@@ -433,27 +446,70 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
               {/* Number of Attendees (Only when attending) */}
               {isAttending && (
                 <div>
-                  <label className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2">
+                  <label htmlFor="attendees_count" className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2 cursor-pointer">
                     Total Number of Attendees <span className="text-ink/50 font-normal">(Optional)</span>
                   </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-brass-deep">
-                      <Users className="w-4 h-4" />
-                    </div>
-                    <input
-                      type="number"
-                      min="1"
-                      max="20"
-                      value={formData.attendees_count}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value, 10) || 1;
-                        setFormData({ ...formData, attendees_count: val });
+                  <div className="flex items-center space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const current = parseInt(formData.attendees_count, 10) || 1;
+                        const next = Math.max(1, current - 1);
+                        setFormData((prev) => ({ ...prev, attendees_count: next }));
                         if (errors.attendees_count) {
-                          setErrors({ ...errors, attendees_count: null });
+                          setErrors((prev) => ({ ...prev, attendees_count: null }));
                         }
                       }}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-brass/40 bg-paper-parchment focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-all text-sm font-semibold text-ink"
-                    />
+                      className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl border border-brass/50 bg-paper-parchment hover:bg-brass/20 text-maroon-deep font-bold text-xl transition-all active:scale-95 cursor-pointer shadow-xs select-none"
+                      title="Decrease attendees"
+                      aria-label="Decrease attendees"
+                    >
+                      −
+                    </button>
+                    <div className="relative flex-1">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-brass-deep">
+                        <Users className="w-4 h-4" />
+                      </div>
+                      <input
+                        id="attendees_count"
+                        name="attendees_count"
+                        type="number"
+                        min="1"
+                        placeholder="1"
+                        value={formData.attendees_count}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '' || /^\d+$/.test(val)) {
+                            setFormData((prev) => ({ ...prev, attendees_count: val }));
+                            if (errors.attendees_count) {
+                              setErrors((prev) => ({ ...prev, attendees_count: null }));
+                            }
+                          }
+                        }}
+                        onBlur={() => {
+                          if (!formData.attendees_count || parseInt(formData.attendees_count, 10) < 1) {
+                            setFormData((prev) => ({ ...prev, attendees_count: 1 }));
+                          }
+                        }}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-brass/40 bg-paper-parchment focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-all text-sm font-semibold text-ink"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const current = parseInt(formData.attendees_count, 10) || 1;
+                        const next = current + 1;
+                        setFormData((prev) => ({ ...prev, attendees_count: next }));
+                        if (errors.attendees_count) {
+                          setErrors((prev) => ({ ...prev, attendees_count: null }));
+                        }
+                      }}
+                      className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl border border-brass/50 bg-paper-parchment hover:bg-brass/20 text-maroon-deep font-bold text-xl transition-all active:scale-95 cursor-pointer shadow-xs select-none"
+                      title="Increase attendees"
+                      aria-label="Increase attendees"
+                    >
+                      +
+                    </button>
                   </div>
                   {errors.attendees_count && (
                     <p className="text-xs text-red-600 mt-1.5 flex items-center space-x-1">
@@ -468,10 +524,12 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
             {/* Additional Guest Names */}
             {isAttending && (
               <div>
-                <label className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2">
+                <label htmlFor="additional_guests" className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2 cursor-pointer">
                   Names of Additional Guests in Your Party <span className="text-ink/50 font-normal">(Optional)</span>
                 </label>
                 <input
+                  id="additional_guests"
+                  name="additional_guests"
                   type="text"
                   placeholder="e.g. Priya Kumar, Arjun Kumar"
                   value={formData.additional_guests}
@@ -588,7 +646,7 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Dietary Requirements */}
               <div>
-                <label className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2">
+                <label htmlFor="dietary_requirements" className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2 cursor-pointer">
                   Dietary Requirements <span className="text-ink/50 font-normal">(Optional)</span>
                 </label>
                 <div className="relative">
@@ -596,6 +654,8 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                     <Utensils className="w-4 h-4" />
                   </div>
                   <input
+                    id="dietary_requirements"
+                    name="dietary_requirements"
                     type="text"
                     placeholder="e.g. Vegetarian, Vegan, Nut allergy, Jain food"
                     value={formData.dietary_requirements}
@@ -607,7 +667,7 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
 
               {/* Special Requests or Message for Couple */}
               <div>
-                <label className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2">
+                <label htmlFor="special_requests" className="block text-xs uppercase tracking-wider text-ink/85 font-semibold mb-2 cursor-pointer">
                   Warm Wishes / Message for the Couple <span className="text-ink/50 font-normal">(Optional)</span>
                 </label>
                 <div className="relative">
@@ -615,6 +675,8 @@ export function RsvpForm({ preselectedEventId, onSuccessSubmission }) {
                     <MessageSquare className="w-4 h-4" />
                   </div>
                   <textarea
+                    id="special_requests"
+                    name="special_requests"
                     rows={2}
                     placeholder="Share your love, blessings, or special song request!"
                     value={formData.special_requests}

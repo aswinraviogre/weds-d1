@@ -81,7 +81,7 @@ rsvpRouter.post('/', async (req, res) => {
     let count = 1;
     if (isAttending && attendees_count !== undefined && attendees_count !== null && attendees_count !== '') {
       const parsedCount = parseInt(attendees_count, 10);
-      if (!isNaN(parsedCount) && parsedCount >= 1 && parsedCount <= 50) {
+      if (!isNaN(parsedCount) && parsedCount >= 1) {
         count = parsedCount;
       }
     } else if (!isAttending) {
