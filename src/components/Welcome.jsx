@@ -27,7 +27,7 @@ export function Welcome() {
                 <div className="relative rounded-t-[140px] rounded-b-2xl overflow-hidden border-2 border-brass/80 p-2.5 bg-gradient-to-b from-brass-soft via-brass to-brass-deep shadow-[0_15px_35px_rgba(20,3,5,0.6)]">
                   <div className="rounded-t-[132px] rounded-b-xl overflow-hidden aspect-[3/4] relative bg-stone-900">
                     <img
-                      src="/images/couple_festive_home.jpg?v=2"
+                      src="/images/couple_festive_home.jpg?v=3"
                       alt={`${couple.fullName} Wedding Portrait`}
                       loading="lazy"
                       className="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-700"
@@ -70,10 +70,8 @@ export function Welcome() {
                   "With the blessings of our families and the love of those closest to our hearts, we invite you to join us as we begin our journey together."
                 </p>
                 <p className="text-[#FFF6D8]/90 leading-relaxed font-light text-sm sm:text-base drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
-                  From joyful celebrations and cherished traditions to the moment we say 'I do,' we would be delighted to have you with us for these special days.
-                </p>
+From joyful celebrations to beautiful moments shared with our loved ones, we would be delighted to have you join us and be part of our special day.                </p>
                 <p className="font-medium text-[#FFCF5C] tracking-wide text-sm sm:text-base drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
-                  Your presence will make our celebration even more meaningful.
                 </p>
               </div>
 

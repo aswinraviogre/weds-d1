@@ -38,12 +38,12 @@ export const weddingConfig = {
     title: "A Celebration of Love & Tradition",
     subtitle: "With the Blessings of Our Families",
     message:
-      "With the blessings of our families and the love of those closest to our hearts, we invite you to join us as we begin our journey together.\n\nFrom joyful celebrations and cherished traditions to the moment we say 'I do,' we would be delighted to have you with us for these special days.\n\nYour presence will make our celebration even more meaningful.",
+      "With the blessings of our families and the love of those closest to our hearts, we invite you to join us as we begin our journey together.\n\nFrom joyful celebrations to beautiful moments shared with our loved ones, we would be delighted to have you join us and be part of our special day.\n\nYour presence will make our celebration even more meaningful.",
   },
 
   hero: {
     salutation: "Together with our families",
-    subSalutation: "JOYFULLY INVITE YOU TO CELEBRATE THEIR WEDDING",
+    subSalutation: "JOYFULLY INVITE YOU TO CELEBRATE OUR WEDDING",
     dates: "November 19–21, 2026",
     location: "Texas, USA",
     tagline: "Three Days. Beautiful Traditions. A Lifetime of Love.",
