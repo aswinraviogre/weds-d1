@@ -27,7 +27,7 @@ export function Welcome() {
                 <div className="relative rounded-t-[140px] rounded-b-2xl overflow-hidden border-2 border-brass/80 p-2.5 bg-gradient-to-b from-brass-soft via-brass to-brass-deep shadow-[0_15px_35px_rgba(20,3,5,0.6)]">
                   <div className="rounded-t-[132px] rounded-b-xl overflow-hidden aspect-[3/4] relative bg-stone-900">
                     <img
-                      src="/images/couple_festive_home.jpg"
+                      src="/images/couple_festive_home.jpg?v=2"
                       alt={`${couple.fullName} Wedding Portrait`}
                       loading="lazy"
                       className="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-700"

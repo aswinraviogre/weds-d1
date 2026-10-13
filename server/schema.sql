@@ -29,17 +29,23 @@ ALTER TABLE public.rsvps ENABLE ROW LEVEL SECURITY;
 
 -- Security Policy:
 -- Public (anonymous visitors) can INSERT their RSVP via the web form.
+DROP POLICY IF EXISTS "Enable public insert for RSVPs" ON public.rsvps;
 CREATE POLICY "Enable public insert for RSVPs" ON public.rsvps
     FOR INSERT 
     WITH CHECK (true);
 
 -- Security Policy:
--- Public visitors CANNOT select, update, or delete guest records.
--- Only the service_role (backend server) or authenticated admin can read or manage RSVPs.
-CREATE POLICY "Restrict read to service role and authenticated admins" ON public.rsvps
+-- Allow reading records (protected at the backend API layer by ADMIN_PASSCODE)
+DROP POLICY IF EXISTS "Restrict read to service role and authenticated admins" ON public.rsvps;
+DROP POLICY IF EXISTS "Enable read for RSVPs" ON public.rsvps;
+CREATE POLICY "Enable read for RSVPs" ON public.rsvps
     FOR SELECT
-    USING (auth.role() = 'service_role' OR auth.role() = 'authenticated');
+    USING (true);
 
-CREATE POLICY "Restrict delete to service role" ON public.rsvps
+-- Security Policy:
+-- Allow deleting records (protected at the backend API layer by ADMIN_PASSCODE)
+DROP POLICY IF EXISTS "Restrict delete to service role" ON public.rsvps;
+DROP POLICY IF EXISTS "Enable delete for RSVPs" ON public.rsvps;
+CREATE POLICY "Enable delete for RSVPs" ON public.rsvps
     FOR DELETE
-    USING (auth.role() = 'service_role');
+    USING (true);
