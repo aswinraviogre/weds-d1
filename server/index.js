@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import fs from 'fs';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -47,6 +48,20 @@ app.get('*', (req, res, next) => {
     return next();
   }
   const indexPath = path.join(distPath, 'index.html');
+  try {
+    if (fs.existsSync(indexPath)) {
+      let html = fs.readFileSync(indexPath, 'utf-8');
+      const protocol = req.headers['x-forwarded-proto'] || (req.secure ? 'https' : 'http');
+      const host = req.headers['x-forwarded-host'] || req.get('host');
+      if (host) {
+        const origin = `${protocol}://${host}`;
+        html = html.replace(/content="\/images\/couple_festive_home\.jpg"/g, `content="${origin}/images/couple_festive_home.jpg"`);
+        html = html.replace(/href="\/images\/couple_festive_home\.jpg"/g, `href="${origin}/images/couple_festive_home.jpg"`);
+      }
+      return res.setHeader('Content-Type', 'text/html').send(html);
+    }
+  } catch (e) {}
+
   res.sendFile(indexPath, (err) => {
     if (err) {
       // In dev mode before build, send a helpful message
